@@ -1,8 +1,9 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import "./chat.css";
+import ReactMarkdown from "react-markdown";
 
-export default function ChatPage({ chats }) {
+export default function ChatPage({ chats, showModal }) {
   const { id } = useParams();
   const chat = chats.find((c) => c.id === id);
 
@@ -147,7 +148,13 @@ export default function ChatPage({ chats }) {
             key={index}
             className={`message ${msg.sender === "user" ? "user" : "ai"}`}
           >
-            <div className="bubble">{msg.text}</div>
+            <div className="bubble">
+              {msg.sender === "ai" ? (
+                <ReactMarkdown>{msg.text}</ReactMarkdown>
+              ) : (
+                msg.text
+              )}
+            </div>
           </div>
         ))}
         <div ref={bottomRef}></div>
