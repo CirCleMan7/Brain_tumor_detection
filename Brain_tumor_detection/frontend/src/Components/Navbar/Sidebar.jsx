@@ -1,21 +1,7 @@
 import { Link } from "react-router-dom";
 import React, {useState} from "react";
 import "./button.css";
-import Modal from "../Form/Modal";
-import { v4 as uuidv4 } from "uuid";
-
-export default function Sidebar({ chats, setChats }) {
-
-  const [showModal, setShowModal] = useState(false);
-
-  function createNewChat(topic, content) {
-    const newChat = {
-      id: uuidv4(),
-      topic: topic,
-      content: content
-    };
-    setChats(c => [...c, newChat]);
-  }
+export default function Sidebar({ chats, setChats, showModal, setShowModal }) {
 
   return (
     <div style={{
@@ -30,16 +16,6 @@ export default function Sidebar({ chats, setChats }) {
     }}>
       <img src="/brain_icon.png" alt="brain" width="50 px"></img> <br></br>
       <button id="new-case-button" onClick={() => setShowModal(true)}>+ New case</button>
-
-      {showModal && (
-        <Modal
-          onClose={() => setShowModal(false)}
-          onSubmit={(topic, content) => {
-            createNewChat(topic, content);
-            setShowModal(false);
-          }}
-        />
-      )}
 
       <h2 style={{color: "black", opacity: "0.6", fontSize: "20"}}>Case</h2>
       {chats.map((chat, index) => (

@@ -19,9 +19,8 @@ export default function Modal({ onClose, onSubmit }) {
   const [selectedDimension, setSelectedDimension] = useState("2D");
 
   const handleClickDimension = (value) => {
-    if (value !== selected) {
+    if (value !== selectedDimension) {
       setSelectedDimension(value);
-      if (onChange) onChange(value);
     }
   };
 
@@ -56,8 +55,6 @@ export default function Modal({ onClose, onSubmit }) {
     setFiles(prev => prev.filter((_, i) => i !== index));
   }
   
-
-
   function handleClick() {
       fileInputRef.current.click();
   }
