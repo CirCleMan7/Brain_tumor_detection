@@ -14,3 +14,31 @@
     background-color: rgb(81, 81, 80);
     cursor: pointer;
 }
+
+.chat-link-box {
+  background-color: #FFFFFF;
+  border: 2px solid #787667;
+  border-radius: 10px;
+  padding: 15px 15px 15px 15px;
+  margin: 10px 0;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chat-link-box:hover {
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.chat-link {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  font-size: 16px;
+  display: block;
+}
+
+.chat-link-box.active-chat {
+  background-color: #c1c1c1; /* highlight color */
+  font-weight: bold;
+}

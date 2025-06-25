@@ -25,9 +25,33 @@ export default function Modal({ onClose, onSubmit }) {
   };
 
 
-  function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (patientFirstName.trim() && patientLastName.trim()) {
+  
+    try {
+      const formData = new FormData();
+      formData.append("doctorFirstName", doctorFirstName);
+      formData.append("doctorLastName", doctorLastName);
+      formData.append("patientId", patientId);
+      formData.append("sampleCollectionDate", sampleCollectionDate);
+      formData.append("testIndication", testIndication);
+      formData.append("selectedDimension", selectedDimension);
+  
+      for (const file of files) {
+        formData.append("files", file);
+      }
+  
+      const res = await fetch("http://localhost:8000/submit_case", {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
+      }
+  
+      const data = await res.json();
+  
       const topic = `${patientFirstName} ${patientLastName}`;
       const content = {
         doctorFirstName,
@@ -36,13 +60,30 @@ export default function Modal({ onClose, onSubmit }) {
         sampleCollectionDate,
         testIndication,
         selectedDimension,
-        files
+        files,
+        imageUrls: data.images || [],
       };
-      onSubmit(topic, content); // send all data
-      setPatientFirstName("");
-      setPatientLastName("");
+  
+      onSubmit(topic, content, data.reply || "Case received, but no AI response.");
+    } catch (err) {
+      console.error("❌ Backend unavailable:", err.message);
+  
+      const topic = `${patientFirstName} ${patientLastName}`;
+      const content = {
+        doctorFirstName,
+        doctorLastName,
+        patientId,
+        sampleCollectionDate,
+        testIndication,
+        selectedDimension,
+        files,
+        imageUrls: [],
+      };
+  
+      // Add fallback message if backend is down
+      onSubmit(topic, content, "❌ Could not contact AI server. Case saved locally.");
     }
-  }
+  };  
 
   function getFileIcon(fileName) {
     const lower = fileName.toLowerCase();
@@ -59,40 +100,48 @@ export default function Modal({ onClose, onSubmit }) {
       fileInputRef.current.click();
   }
 
-
   function handleFileChange(event) {
-      const newFiles = Array.from(event.target.files);
+    const newFiles = Array.from(event.target.files);
 
-      // Validate by MIME type or extension
-      const allowedFiles = newFiles.filter(file => {
-          const isPDF = file.type === "application/pdf";
-          const isJPG = file.type.startsWith("image/jpeg");
-          const isNii = file.name.toLowerCase().endsWith(".nii");
-          return isPDF || isJPG || isNii;
-      });
+    // Validate by MIME type or extension
+    const allowedFiles = newFiles.filter(file => {
+        const isPDF = file.type === "application/pdf";
+        const isJPG = file.type.startsWith("image/jpeg");
+        const isNii = file.name.toLowerCase().endsWith(".nii");
+        const isPNG = file.type.startsWith("image/png");
+        return isPDF || isJPG || isNii || isPNG;
+    });
 
-      // Check total file limit
-      const total = files.length + allowedFiles.length;
-      if (total > 2) {
-          alert("Please input only up to 2 files total.");
-          event.target.value = null;
-          return;
-      }
+    // Check total file limit
+    const total = files.length + allowedFiles.length;
+    if (total > 2) {
+        alert("Please input only up to 2 files total.");
+        event.target.value = null;
+        return;
+    }
 
-      // Prevent duplicates by file name
-      const allFiles = [...files, ...allowedFiles];
-      const unique = Array.from(new Set(allFiles.map(f => f.name)))
-          .map(name => allFiles.find(f => f.name === name));
+    // Convert to object with preview URL
+    const withPreview = allowedFiles.map((f) => ({
+      name: f.name,
+      type: f.type,
+      url: f.type.startsWith("image/") ? URL.createObjectURL(f) : null,
+    }));
 
-      setFiles(unique);
-      event.target.value = null; // allow re-selecting same file again
+    // Avoid duplicates
+    const allFiles = [...files, ...withPreview];
+    const unique = Array.from(new Set(allFiles.map((f) => f.name))).map((name) =>
+      allFiles.find((f) => f.name === name)
+    );
+
+    setFiles(unique);
+    event.target.value = null;
   }
   
   return (
     <div className="modal-overlay">
       <div className="modal-box">
         <img src="../../public/brain_image.png" alt="brain_image" style={{position: "absolute", width: "130px", marginBottom: "0px"}}></img>
-        <button className="close-button" onClick={onClose}>Cancel</button>
+        <button className="close-button" onClick={onClose}></button>
         <div className="input-box">
           <button id="dimension-isSelected-button" 
             className={`${selectedDimension === "2D" ? "dimension-notSelected-button" : ""}`}
@@ -108,8 +157,6 @@ export default function Modal({ onClose, onSubmit }) {
             <InputBox info={patientFirstName} setTopic={setPatientFirstName} title={"ชื่อ (ผู้ป่วย)"} required={true} type={"text"}/>
             <InputBox info={patientLastName} setTopic={setPatientLastName} title={"นามสกุล (ผู้ป่วย)"} required={true} type={"text"}/>
           </div>
-          {/* <hr></hr>
-          <label style={{color: "black", marginLeft: "160px"}}>optional</label> */}
           <div className="input-box">
           <InputBox info={doctorFirstName} setTopic={setDoctorFirstName} title={"ชื่อจริง (แพทย์ผู้สั่งตรวจ)"} required={false} type={"text"}/>
           <InputBox info={doctorLastName} setTopic={setDoctorLastName} title={"นามสกุล (แพทย์ผู้สั่งตรวจ)"} required={false} type={"text"}/>
@@ -119,7 +166,7 @@ export default function Modal({ onClose, onSubmit }) {
           <InputBox info={sampleCollectionDate} setTopic={setSampleCollectionDate} title={"วันที่เก็บตัวอย่าง"} required={false} type={"date"}/>
           </div>
           <div className="input-box-area">
-            <InputArea></InputArea>
+            <InputArea info={testIndication} setTopic={setTestIndication} title={"ข้อบ่งชี้ในการตรวจ"} required={false}></InputArea>
           </div>
 
           <div style={{ display: "flex", justifyContent: "center", gap: "30px", marginTop: "30px", alignItems: "flex-start" }}>

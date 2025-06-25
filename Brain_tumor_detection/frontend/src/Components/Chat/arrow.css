@@ -1,0 +1,81 @@
+.arrow {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .arrow::before,
+  .arrow::after {
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 19px;
+    background-color: #020202;
+    border-radius: 2px;
+    transition: 0.3s ease;
+  }
+  
+  /* Hover effect */
+  .arrow:hover {
+    transform: scale(1.2);
+  }
+  
+  .arrow:hover::before,
+  .arrow:hover::after {
+    background-color: #75BFCD; /* brighter red */
+  }
+  
+  /* RIGHT ARROW */
+  .arrow.right::before {
+    transform: rotate(-45deg);
+    left: 15px;
+    top: 5px;
+  }
+  
+  .arrow.right::after {
+    transform: rotate(45deg);
+    left: 15px;
+    top: 15px;
+  }
+  
+  /* LEFT ARROW */
+  .arrow.left::before {
+    transform: rotate(45deg);
+    left: 20px;
+    top: 5px;
+  }
+  
+  .arrow.left::after {
+    transform: rotate(-45deg);
+    left: 20px;
+    top: 15px;
+  }
+  
+  /* UP ARROW */
+  .arrow.up::before {
+    transform: rotate(45deg);
+    top: 20px;
+    left: 5px;
+  }
+  
+  .arrow.up::after {
+    transform: rotate(-45deg);
+    top: 20px;
+    left: 15px;
+  }
+  
+  /* DOWN ARROW */
+  .arrow.down::before {
+    transform: rotate(-45deg);
+    top: 5px;
+    left: 5px;
+  }
+  
+  .arrow.down::after {
+    transform: rotate(45deg);
+    top: 5px;
+    left: 15px;
+  }
+  
