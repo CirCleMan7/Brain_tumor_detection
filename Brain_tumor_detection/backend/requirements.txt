@@ -4,3 +4,4 @@ httpx
 python-dotenv
 nibabel
 pillow
+python-multipart
