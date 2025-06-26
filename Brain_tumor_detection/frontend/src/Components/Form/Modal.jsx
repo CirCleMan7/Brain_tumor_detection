@@ -119,11 +119,11 @@ export default function Modal({ onClose, onSubmit }) {
 
     // Check total file limit
     const total = files.length + allowedFiles.length;
-    if (total > 2) {
-        alert("Please input only up to 2 files total.");
-        event.target.value = null;
-        return;
-    }
+    // if (total > 2) {
+    //     alert("Please input only up to 2 files total.");
+    //     event.target.value = null;
+    //     return;
+    // }
 
     // Convert to object with preview URL
     const withPreview = allowedFiles.map((f) => ({
@@ -174,22 +174,21 @@ export default function Modal({ onClose, onSubmit }) {
             <InputArea info={testIndication} setTopic={setTestIndication} title={"ข้อบ่งชี้ในการตรวจ"} required={false}></InputArea>
           </div>
 
+
           <div style={{ display: "flex", justifyContent: "center", gap: "30px", marginTop: "30px", alignItems: "flex-start" }}>
+          <button type="button" className="add-file-button" onClick={handleClick}>Upload</button>
+          <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: "none" }} />
           {/* 📄 File List (Small Left Panel) */}
-          <div
-            style={{
-              width: "250px",
-              maxHeight: "300px",
-              overflowY: "auto",
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-              padding: "8px",
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              backgroundColor: "#f9f9f9",
-            }}
-          >
+          <div style={{
+            maxWidth: '90%',
+            maxHeight: '120px',   // limit height
+            overflowX: 'auto',    // horizontal scrollbar
+            whiteSpace: 'nowrap', // keep images in one line
+            padding: '8px',
+            border: '1px solid #ccc',
+            borderRadius: '8px',
+            marginBottom: '10px',
+          }}>
             <strong style={{ fontSize: "0.95rem", marginBottom: "4px", color: "#333" }}>Files</strong>
             {files.map((file, index) => (
               <div
@@ -228,9 +227,7 @@ export default function Modal({ onClose, onSubmit }) {
 
           {/* 📤 Upload + Create Buttons */}
           <div style={{ display: "flex", marginTop: "10px", marginLeft: "100px",flexDirection: "column", gap: "30px", alignItems: "center" }}>
-            <button type="button" className="add-file-button" onClick={handleClick}>Upload</button>
-            <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: "none" }} />
-            <button type="submit" className="add-file-button">Create</button>
+            <button type="submit" className="add-file-button">Submit</button>
           </div>
         </div>
         </form>
