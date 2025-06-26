@@ -41,6 +41,11 @@ export default function Modal({ onClose, onSubmit }) {
         formData.append("files", file);
       }
 
+      console.log("files:", files);
+      for (const file of files) {
+        console.log("file:", file, "isFile:", file instanceof File);
+      }
+
       console.log(files);
       
       const res = await fetch("http://localhost:8000/submit_case", {
@@ -66,8 +71,10 @@ export default function Modal({ onClose, onSubmit }) {
         files,
         imageUrls: data.images || [],
       };
-  
-      onSubmit(topic, content, data.reply || "Case received, but no AI response.");
+      
+      console.log(data.images);
+
+      onSubmit(topic, content, data.reply || "Case received, but no response.");
     } catch (err) {
       console.error("❌ Backend unavailable:", err.message);
   
@@ -82,7 +89,7 @@ export default function Modal({ onClose, onSubmit }) {
         files,
         imageUrls: [],
       };
-  
+      
       // Add fallback message if backend is down
       onSubmit(topic, content, "❌ Could not contact AI server. Case saved locally.");
 
@@ -107,40 +114,26 @@ export default function Modal({ onClose, onSubmit }) {
 
   function handleFileChange(event) {
     const newFiles = Array.from(event.target.files);
-
-    // Validate by MIME type or extension
-    const allowedFiles = newFiles.filter(file => {
-        const isPDF = file.type === "application/pdf";
-        const isJPG = file.type.startsWith("image/jpeg");
-        const isNii = file.name.toLowerCase().endsWith(".nii");
-        const isPNG = file.type.startsWith("image/png");
-        return isPDF || isJPG || isNii || isPNG;
+  
+    // Validate file types
+    const allowedFiles = newFiles.filter((file) => {
+      const isPDF = file.type === "application/pdf";
+      const isJPG = file.type.startsWith("image/jpeg");
+      const isPNG = file.type.startsWith("image/png");
+      const isNii = file.name.toLowerCase().endsWith(".nii");
+      return isPDF || isJPG || isPNG || isNii;
     });
-
-    // Check total file limit
-    const total = files.length + allowedFiles.length;
-    // if (total > 2) {
-    //     alert("Please input only up to 2 files total.");
-    //     event.target.value = null;
-    //     return;
-    // }
-
-    // Convert to object with preview URL
-    const withPreview = allowedFiles.map((f) => ({
-      name: f.name,
-      type: f.type,
-      url: f.type.startsWith("image/") ? URL.createObjectURL(f) : null,
-    }));
-
-    // Avoid duplicates
-    const allFiles = [...files, ...withPreview];
+  
+    // Avoid duplicates by name
+    const allFiles = [...files, ...allowedFiles];
     const unique = Array.from(new Set(allFiles.map((f) => f.name))).map((name) =>
       allFiles.find((f) => f.name === name)
     );
-
+  
     setFiles(unique);
-    event.target.value = null;
+    event.target.value = null; // reset file input
   }
+  
   
   return (
     <div className="modal-overlay">
