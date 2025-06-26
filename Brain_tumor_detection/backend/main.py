@@ -21,7 +21,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # secure this in prod
+    allow_origins=["http://localhost:3000"],  # secure this in prod
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -91,7 +91,7 @@ async def submit_case(
     sampleCollectionDate: Optional[str] = Form(None),
     testIndication: str = Form(None),
     selectedDimension: str = Form(None),
-    files: List[UploadFile] = File(None)
+    files: List[UploadFile] = File(default=[])
 ):
     images = []
 
