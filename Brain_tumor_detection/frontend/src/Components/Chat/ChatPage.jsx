@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import "./chat.css";
-import "./arrow.css"
+import "./arrow.css";
 
 export default function ChatPage({ chats, setChats, showModal }) {
   const { id } = useParams();
@@ -25,6 +25,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
         body: JSON.stringify({ prompt: userPrompt }),
       });
       if (!res.ok) throw new Error("Server error");
+
       const data = await res.json();
       return data.reply || "No response from Gemini";
     } catch (error) {
@@ -204,6 +205,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
       {conversation.map((msg, index) => (
         <div key={index} className={`message ${msg.sender}`}>
           <div className="bubble">
+            <div className="ai-icon"/>
             {msg.sender === "ai" ? (
               <ReactMarkdown>{msg.text}</ReactMarkdown>
             ) : (

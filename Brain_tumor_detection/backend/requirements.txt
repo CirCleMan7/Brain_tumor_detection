@@ -2,3 +2,5 @@ fastapi
 uvicorn
 httpx
 python-dotenv
+nibabel
+pillow
