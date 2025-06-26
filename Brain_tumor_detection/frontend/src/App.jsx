@@ -5,6 +5,7 @@ import Modal from "./Components/Form/Modal";
 import React, {useState, useEffect} from 'react'
 import { v4 as uuidv4 } from "uuid";
 import "./App.css"
+import Introduction from "./Components/Intoduction";
 
 export default function App() {
   const [chats, setChats] = useState([]);
@@ -24,6 +25,9 @@ export default function App() {
       ],
     };
     setChats((c) => [...c, newChat]);
+
+    console.log("this is form app.jsx")
+    console.log(newChat.content);
   }
 
     // Load from localStorage on first mount
@@ -51,7 +55,7 @@ export default function App() {
         <div style={{ marginLeft: "250px", padding: "20px", flex: 1 }}>
           <Routes>
             <Route path="/chat/:id" element={<ChatPage chats={chats} setChats={setChats} showModal={showModal} />} />
-            <Route path="/" element={<h2>Select a chat</h2>} />
+            <Route path="/" element={<Introduction/>} />
           </Routes>
         </div>
       </div>

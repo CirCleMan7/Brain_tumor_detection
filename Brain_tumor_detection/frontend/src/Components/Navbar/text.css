@@ -1,6 +1,0 @@
-.truncate {
-    white-space: nowrap;       /* Keep in one line */
-    overflow: hidden;          /* Hide overflow */
-    text-overflow: ellipsis;   /* Show ... */
-    max-width: 180px;          /* Adjust width as needed */
-}
