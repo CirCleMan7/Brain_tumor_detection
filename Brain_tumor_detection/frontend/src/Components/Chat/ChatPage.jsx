@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import "./chat.css";
 import "./arrow.css";
+import ChatInput from "./ChatInput";
 
 export default function ChatPage({ chats, setChats, showModal }) {
   const { id } = useParams();
@@ -17,24 +18,45 @@ export default function ChatPage({ chats, setChats, showModal }) {
     setConversation(chat?.conversation || []);
   }, [chat]);
 
+  const [abortController, setAbortController] = useState(null);
+
   async function getGeminiMessage(userPrompt) {
+    const controller = new AbortController();
+    setAbortController(controller);
+
     try {
       const res = await fetch("http://localhost:8000/gemini", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: userPrompt }),
+        signal: controller.signal,
       });
+
       if (!res.ok) throw new Error("Server error");
 
       const data = await res.json();
       return data.reply || "No response from Gemini";
     } catch (error) {
-      console.error("Failed to contact Gemini:", error.message);
-      return "❌ Sorry, I couldn’t connect to the AI server.";
+      if (err.name === "AbortError") {
+        // ✅ Handle cancellation gracefully
+        console.log("Fetch was canceled");
+        return "❌ AI response canceled by user."; // 👈 Return fallback
+      }
+      else {
+        console.error("Failed to contact Gemini:", error.message);
+        return "❌ Sorry, I couldn’t connect to the AI server.";
+      }
+    } finally {
+      setAbortController(null); // clear it
     }
   }
 
+  const [isTyping, setIsTyping] = useState(false);
+
   const handleSend = async () => {
+
+    setIsTyping(true)
+
     const trimmed = input.trim();
     if (!trimmed) return;
 
@@ -63,6 +85,17 @@ export default function ChatPage({ chats, setChats, showModal }) {
         c.id === chat.id ? { ...c, conversation: updatedMessages } : c
       )
     );
+
+    setIsTyping(false);
+  };
+
+  const cancelTyping = () => {
+    if (abortController) {
+      abortController.abort(); // cancel fetch
+    }
+  
+    setConversation((prev) => prev.filter((msg) => msg.text !== "typing..."));
+    setIsTyping(false);
   };
 
   const bottomRef = useRef();
@@ -202,31 +235,30 @@ export default function ChatPage({ chats, setChats, showModal }) {
 
     {/* Add key here for instant chat switch */}
     <div key={chat.id} className="chat-log" ref={chatLogRef}>
-      {conversation.map((msg, index) => (
-        <div key={index} className={`message ${msg.sender}`}>
+    {conversation.map((msg, index) => (
+      <div key={index} className={`message ${msg.sender}`}>
+        <div className="message-content">
+          {msg.sender === "ai" && (
+            <>
+              <img src="/ai-icon.png" className="ai-icon"></img>
+              <div className="sender-name">AI Brain Expert</div>
+            </>
+          )}
           <div className="bubble">
-            <div className="ai-icon"/>
             {msg.sender === "ai" ? (
               <ReactMarkdown>{msg.text}</ReactMarkdown>
             ) : (
-              msg.text
+              <ReactMarkdown>{msg.text}</ReactMarkdown>
             )}
           </div>
         </div>
-      ))}
+      </div>
+    ))}
+
       <div ref={bottomRef} />
     </div>
 
-    <div className="chat-input">
-      <input
-        type="text"
-        value={input}
-        placeholder="Type your message..."
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleSend()}
-      />
-      <button onClick={handleSend}>Send</button>
-    </div>
+    <ChatInput input={input} setInput={setInput} handleSend={handleSend} isTyping={isTyping} cancelTyping={cancelTyping}></ChatInput>
   </div>
   );
 }

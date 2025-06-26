@@ -1,4 +1,4 @@
-function InputInfo({info, set = () => {}, type = "text"}, required) {
+function InputInfo({info, set = () => {}, type = "text", required}) {
     return (
         <>
             <input

@@ -1,0 +1,54 @@
+.chat-input-container {
+    position: fixed;
+    bottom: 20px;
+    width: 80%;
+    height: 140px; /* container height */
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+.chat-input-inner {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .textarea-wrapper {
+    border-radius: 15px;
+    border: 1px solid #0c0b0b;
+    overflow: hidden;
+    width: 90%;
+    background-color: white;
+  }  
+  
+  .chat-textarea {
+    width: 100%;
+    min-height: 40px;
+    max-height: 120px;
+    /* margin: 8px 1px 8px 8px; */
+    padding: 10px;
+    resize: none;
+    overflow-y: auto;
+    font-size: 14px;
+    box-sizing: border-box;
+
+    /* Add these to remove border */
+    border: none;
+    outline: none; /* optional: removes focus outline */
+    background: transparent; /* if used inside styled wrapper */
+  }
+  
+  .send-button {
+    padding: 8px 12px;
+    font-weight: bold;
+    border: none;
+    background-color: #1976d2;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  

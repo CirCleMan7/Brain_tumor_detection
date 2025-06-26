@@ -17,7 +17,7 @@ function InputArea(props) {
             backgroundColor: "#f0f0f0",
             fontSize: "1rem",
             fontFamily: "inherit",
-            resize: "vertical",
+            resize: "none",
             marginTop: "20px",
             boxShadow: "inset 0 1px 2px rgba(0,0,0,0.1)",
             transition: "border-color 0.3s, box-shadow 0.3s",
