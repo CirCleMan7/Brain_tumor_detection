@@ -91,7 +91,7 @@ async def submit_case(
     sampleCollectionDate: Optional[str] = Form(None),
     testIndication: str = Form(None),
     selectedDimension: str = Form(None),
-    files: List[UploadFile] = File(None)
+    files: List[UploadFile] = File(default=[])
 ):
     images = []
 
