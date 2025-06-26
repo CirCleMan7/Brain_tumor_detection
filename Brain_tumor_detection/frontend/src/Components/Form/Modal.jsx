@@ -40,12 +40,15 @@ export default function Modal({ onClose, onSubmit }) {
       for (const file of files) {
         formData.append("files", file);
       }
-  
+
+      console.log(files);
+      
       const res = await fetch("http://localhost:8000/submit_case", {
         method: "POST",
         body: formData,
       });
-  
+      
+      console.log("FormData entries:", [...formData.entries()]);
       if (!res.ok) {
         throw new Error(`Server error: ${res.status}`);
       }
@@ -82,6 +85,8 @@ export default function Modal({ onClose, onSubmit }) {
   
       // Add fallback message if backend is down
       onSubmit(topic, content, "❌ Could not contact AI server. Case saved locally.");
+
+
     }
   };  
 
