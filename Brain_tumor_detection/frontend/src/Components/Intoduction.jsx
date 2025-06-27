@@ -81,7 +81,7 @@ function Introduction() {
               borderRadius: "8px",
               display: "inline-block"
             }}>
-              Get started by selecting or uploading a patient case.
+              Get started by click new case on your left.
             </p>
           </div>
     )
