@@ -24,79 +24,23 @@ export default function Modal({ onClose, onSubmit }) {
     }
   };
 
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
   
-    try {
-      const formData = new FormData();
-      formData.append("doctorFirstName", doctorFirstName);
-      formData.append("doctorLastName", doctorLastName);
-      formData.append("patientId", patientId);
-      formData.append("sampleCollectionDate", sampleCollectionDate);
-      formData.append("testIndication", testIndication);
-      formData.append("selectedDimension", selectedDimension);
+    const topic = `${patientFirstName} ${patientLastName}`;
+    const content = {
+      doctorFirstName,
+      doctorLastName,
+      patientId,
+      sampleCollectionDate,
+      testIndication,
+      selectedDimension,
+      files,
+    };
   
-      for (const file of files) {
-        formData.append("files", file);
-      }
-
-      console.log("files:", files);
-      for (const file of files) {
-        console.log("file:", file, "isFile:", file instanceof File);
-      }
-
-      console.log(files);
-      
-      const res = await fetch("http://localhost:8000/submit_case", {
-        method: "POST",
-        body: formData,
-      });
-      
-      console.log("FormData entries:", [...formData.entries()]);
-      if (!res.ok) {
-        throw new Error(`Server error: ${res.status}`);
-      }
+    onSubmit(topic, content); // Let App.jsx take over
+  };
   
-      const data = await res.json();
-  
-      const topic = `${patientFirstName} ${patientLastName}`;
-      const content = {
-        doctorFirstName,
-        doctorLastName,
-        patientId,
-        sampleCollectionDate,
-        testIndication,
-        selectedDimension,
-        files,
-        imageUrls: data.images || [],
-      };
-      
-      console.log(data.images);
-
-      onSubmit(topic, content, data.reply || "Case received, but no response.");
-    } catch (err) {
-      console.error("❌ Backend unavailable:", err.message);
-  
-      const topic = `${patientFirstName} ${patientLastName}`;
-      const content = {
-        doctorFirstName,
-        doctorLastName,
-        patientId,
-        sampleCollectionDate,
-        testIndication,
-        selectedDimension,
-        files,
-        imageUrls: [],
-      };
-      
-      // Add fallback message if backend is down
-      onSubmit(topic, content, "❌ Could not contact AI server. Case saved locally.");
-
-
-    }
-  };  
-
   function getFileIcon(fileName) {
     const lower = fileName.toLowerCase();
     if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "🖼️";
