@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import './chatinput.css'
 
-export default function ChatInput({ input, setInput, handleSend, isTyping, cancelTyping }) {
+export default function ChatInput({ input, setInput, handleSend, isTyping, cancelTyping, disabled, chat }) {
   const textareaRef = useRef(null);
 
   useEffect(() => {
@@ -10,6 +10,12 @@ export default function ChatInput({ input, setInput, handleSend, isTyping, cance
       textareaRef.current.style.height = textareaRef.current.scrollHeight + "px"; // Grow to fit
     }
   }, [input]);
+
+  useEffect(() => {
+    if (textareaRef.current && !disabled) {
+      textareaRef.current.focus();
+    }
+  }, [chat, disabled]); // runs when chat ID changes or becomes enabled
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -31,7 +37,7 @@ export default function ChatInput({ input, setInput, handleSend, isTyping, cance
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               className="chat-textarea"
-              disabled={isTyping}
+              disabled= {disabled}
             />
           </div>
           {/* <button onClick={handleSend} className="send-button">Send</button> */}

@@ -1,11 +1,60 @@
 import { Link, useLocation } from "react-router-dom";
-import React, {useState} from "react";
+import React, {useRef} from "react";
+import { useNavigate } from "react-router-dom";
 import "./button.css";
 import ExportButton from "./ExportButton";
 
-export default function Sidebar({ chats, setShowModal }) {
+export default function Sidebar({ chats, setChats ,setShowModal }) {
 
   const location = useLocation();
+
+  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
+
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.endsWith(".json")) {
+      alert("Please upload a JSON file.");
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target.result);
+
+        // Optional: Validate your chat JSON structure here
+        console.log("get json");
+
+        if (!json.id || !json.topic) {
+          alert("Invalid chat data.");
+          return;
+        }
+
+        console.log("making chat");
+
+        setChats((prev) => [...prev, json]);
+        navigate(`/chat/${json.id}`);
+
+        console.log("finish");
+
+      } catch (err) {
+        alert("Failed to parse JSON file.");
+      }
+    };
+
+    reader.readAsText(file);
+
+    // Reset input so same file can be uploaded again if needed
+    event.target.value = null;
+  };
 
   return (
     <div style={{
@@ -25,6 +74,14 @@ export default function Sidebar({ chats, setShowModal }) {
       </Link>
       <br></br>
       <button id="new-case-button" onClick={() => setShowModal(true)}>+ New case</button>
+      <button id="upload-button" onClick={handleUploadClick} >Upload file</button>
+      <input
+        type="file"
+        accept=".json"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
       <h2 style={{color: "black", opacity: "0.6", fontSize: "20"}}>Case</h2>
       {chats.map((chat, index) => {
         const isActive = location.pathname === `/chat/${chat.id}`;
@@ -35,7 +92,7 @@ export default function Sidebar({ chats, setShowModal }) {
           >
             <Link className="chat-link" to={`/chat/${chat.id}`}>
               <div title={chat.topic} style={{ display: "flex", alignItems: "center" }}>
-                <ExportButton />
+                <ExportButton chat={chat} />
                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginLeft: "10px" }}>
                     <div style={{ fontSize: "14px", fontWeight: "bold", textOverflow: "ellipsis", maxWidth: "120px", overflow: "hidden", whiteSpace: "nowrap" }}>{chat.topic}</div>
                     <div style={{ fontSize: "12px", color: "black", fontWeight: "lighter" }}>uncase ({chat.content.selectedDimension})</div>
