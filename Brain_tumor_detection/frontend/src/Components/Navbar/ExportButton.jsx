@@ -1,10 +1,31 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const ExportButton = () => {
+
+const ExportButton = ({ chat }) => {
+  const handleExport = () => {
+    const dataStr = JSON.stringify(chat, null, 2); // pretty print
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${chat.topic.replace(/\s+/g, "_") || "chat"}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <StyledWrapper>
-      <button className="action_has has_saved" aria-label="save" type="button">
+      <button className="action_has has_saved" aria-label="save" type="button" 
+        onClick={(e) => {
+          e.preventDefault(); // prevent navigation if inside Link
+          e.stopPropagation(); // stop event bubbling (optional)
+          handleExport();
+        }}>
         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width={20} height={20} strokeLinejoin="round" strokeLinecap="round" strokeWidth={2} viewBox="0 0 24 24" stroke="currentColor" fill="none">
           <path d="m19,21H5c-1.1,0-2-.9-2-2V5c0-1.1.9-2,2-2h11l5,5v11c0,1.1-.9,2-2,2Z" strokeLinejoin="round" strokeLinecap="round" data-path="box" />
           <path d="M7 3L7 8L15 8" strokeLinejoin="round" strokeLinecap="round" data-path="line-top" />

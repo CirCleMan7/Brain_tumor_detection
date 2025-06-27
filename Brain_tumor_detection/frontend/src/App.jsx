@@ -124,6 +124,7 @@ export default function App() {
       <div style={{ display: "flex" }}>
         <Sidebar
           chats={chats}
+          setChats={setChats}
           showModal={showModal}
           setShowModal={setShowModal}
         />

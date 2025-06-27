@@ -282,9 +282,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
       <div ref={bottomRef} />
     </div>
 
-    {conversation.length > 1 && (
-      <ChatInput input={input} setInput={setInput} handleSend={handleSend} isTyping={isTyping} cancelTyping={cancelTyping}></ChatInput>
-    )}
+    <ChatInput input={input} setInput={setInput} handleSend={handleSend} isTyping={isTyping} cancelTyping={cancelTyping} disabled={conversation.length <= 1} chat={chat}></ChatInput>
   </div>
   );
 }
