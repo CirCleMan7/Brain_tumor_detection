@@ -34,10 +34,10 @@ export default function Sidebar({ chats, setShowModal }) {
             className={`chat-link-box ${isActive ? "active-chat" : ""}`}
           >
             <Link className="chat-link" to={`/chat/${chat.id}`}>
-              <div style={{ display: "flex", alignItems: "center" }}>
+              <div title={chat.topic} style={{ display: "flex", alignItems: "center" }}>
                 <ExportButton />
                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginLeft: "10px" }}>
-                    <div style={{ fontSize: "14px", fontWeight: "bold" }}>{chat.topic}</div>
+                    <div style={{ fontSize: "14px", fontWeight: "bold", textOverflow: "ellipsis", maxWidth: "120px", overflow: "hidden", whiteSpace: "nowrap" }}>{chat.topic}</div>
                     <div style={{ fontSize: "12px", color: "black", fontWeight: "lighter" }}>uncase ({chat.content.selectedDimension})</div>
                   </div>
               </div>

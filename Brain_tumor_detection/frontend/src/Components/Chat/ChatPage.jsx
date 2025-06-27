@@ -203,9 +203,14 @@ export default function ChatPage({ chats, setChats, showModal }) {
     
   };
 
-  if (!chat) return (
-    <h1>no chat</h1>
-  )
+  if (!chat) {
+    return (
+      <div style={{ padding: "20px", color: "black" }}>
+        <h2>No chat found</h2>
+        <p>Please select a chat from the sidebar or create a new case.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="chat-page">
@@ -277,7 +282,9 @@ export default function ChatPage({ chats, setChats, showModal }) {
       <div ref={bottomRef} />
     </div>
 
-    <ChatInput input={input} setInput={setInput} handleSend={handleSend} isTyping={isTyping} cancelTyping={cancelTyping}></ChatInput>
+    {conversation.length > 1 && (
+      <ChatInput input={input} setInput={setInput} handleSend={handleSend} isTyping={isTyping} cancelTyping={cancelTyping}></ChatInput>
+    )}
   </div>
   );
 }

@@ -6,28 +6,104 @@ import React, {useState, useEffect} from 'react'
 import { v4 as uuidv4 } from "uuid";
 import "./App.css"
 import Introduction from "./Components/Intoduction";
+import { useNavigate } from "react-router-dom";
 
 export default function App() {
   const [chats, setChats] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
   // Handler for creating new chat from modal submit
-  function createNewChat(topic, content, aiReply) {
+  async function createNewChat(topic, content) {
+    const chatId = uuidv4();
+
+    // Step 1: Add new chat immediately
     const newChat = {
-      id: uuidv4(),
+      id: chatId,
       topic: topic,
       content: content,
       conversation: [
         {
           sender: "ai",
-          text: aiReply || `New case created for ${topic}`,
+          text: "🧠 Processing your data...",
         },
       ],
     };
-    setChats((c) => [...c, newChat]);
+    setChats((prev) => [...prev, newChat]);
 
-    console.log("this is form app.jsx")
-    console.log(newChat.content);
+    // Step 2: Navigate to new chat page
+    navigate(`/chat/${chatId}`);
+
+    // Step 3: Process backend (first submit_case, then gemini)
+    console.log("slepp");
+    await sleep(3000);
+    console.log("wake up");
+    try {
+      const formData = new FormData();
+      Object.entries(content).forEach(([key, value]) => {
+        if (key === "files") {
+          for (const file of value) formData.append("files", file);
+        } else {
+          formData.append(key, value);
+        }
+      });
+
+      const res = await fetch("http://localhost:8000/submit_case", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      const aiPrompt = `Analyze case for ${topic}`;
+      
+      // Optionally send to Gemini
+      const geminiRes = await fetch("http://localhost:8000/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: aiPrompt }),
+      });
+
+      const geminiData = await geminiRes.json();
+      const aiReply = geminiData.reply || "❌ Failed to connect AI.";
+
+
+      // Step 4: Update conversation in chat
+      setChats((prevChats) =>
+        prevChats.map((c) =>
+          c.id === chatId
+            ? {
+                ...c,
+                content: {
+                  ...c.content,
+                  imageUrls: data.images || [],
+                },
+                conversation: [
+                  { sender: "ai", text: "✅ Case processed successfully." },
+                  { sender: "ai", text: aiReply },
+                ],
+              }
+            : c
+        )
+      );
+    } catch (err) {
+      console.error("Processing failed:", err.message);
+      setChats((prevChats) =>
+        prevChats.map((c) =>
+          c.id === chatId
+            ? {
+                ...c,
+                conversation: [
+                  { sender: "ai", text: "❌ Failed to process case." },
+                ],
+              }
+            : c
+        )
+      );
+    }
   }
 
     // Load from localStorage on first mount
@@ -44,7 +120,7 @@ export default function App() {
   }, [chats]);
 
   return (
-    <Router>
+    <>
       <div style={{ display: "flex" }}>
         <Sidebar
           chats={chats}
@@ -65,11 +141,11 @@ export default function App() {
         <Modal
           onClose={() => setShowModal(false)}
           onSubmit={(topic, content) => {
-            createNewChat(topic, content);
             setShowModal(false);
+            createNewChat(topic, content);
           }}
         />
       )}
-    </Router>
+    </>
   );
 }
