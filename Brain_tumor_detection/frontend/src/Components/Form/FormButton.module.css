@@ -113,11 +113,12 @@
 
 .close-button {
     overflow: hidden;
-    position: relative;
+    position: absolute;
+    margin-left: 940px;
     border: none;
     padding: 0;
-    width: 2em; height: 2em;
-    border-radius: 50%;
+    width: 3em; height: 3em;
+    border-radius: 15%;
     background: transparent;
     color: #000000;
     font: inherit;

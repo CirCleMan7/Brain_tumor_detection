@@ -83,6 +83,8 @@ export default function App() {
                 },
                 conversation: [
                   { sender: "ai", text: "✅ Case processed successfully." },
+                  { sender: "ai", 
+                    text: (`Doctor name is ${c.topic}\nPatient name is ${c.patientFirstName} ${c.patientLastName}`)},
                   { sender: "ai", text: aiReply },
                 ],
               }
@@ -140,6 +142,7 @@ export default function App() {
       {/* Render modal here at top level */}
       {showModal && (
         <Modal
+          chats={chats}
           onClose={() => setShowModal(false)}
           onSubmit={(topic, content) => {
             setShowModal(false);

@@ -2,9 +2,9 @@ import React, { useState, useRef } from "react";
 import "./Modal.css";
 import InputBox from "./InputBox";
 import InputArea from "./InputArea";
-import "./button.css";
+import buttonStyles from "./FormButton.module.css";
 
-export default function Modal({ onClose, onSubmit }) {
+export default function Modal({ onClose, onSubmit, chats }) {
   const [patientFirstName, setPatientFirstName] = useState("");
   const [patientLastName, setPatientLastName] = useState("");
   const [doctorFirstName, setDoctorFirstName] = useState("");
@@ -26,8 +26,14 @@ export default function Modal({ onClose, onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+    
     const topic = `${patientFirstName} ${patientLastName}`;
+
+    if (chats.some(chat => chat.topic?.trim().toLowerCase() === topic?.trim().toLowerCase())) {
+      alert("Topic already exists. Please choose another.");
+      return;
+    }
+  
     const content = {
       doctorFirstName,
       doctorLastName,
@@ -83,13 +89,13 @@ export default function Modal({ onClose, onSubmit }) {
     <div className="modal-overlay">
       <div className="modal-box">
         <img src="../../public/brain_image.png" alt="brain_image" style={{position: "absolute", width: "130px", marginBottom: "0px"}}></img>
-        <button className="close-button" onClick={onClose}></button>
+        <button className={buttonStyles["close-button"]} onClick={onClose}></button>
         <div className="input-box">
-          <button id="dimension-isSelected-button" 
+          <button id={buttonStyles["dimension-isSelected-button"]}
             className={`${selectedDimension === "2D" ? "dimension-notSelected-button" : ""}`}
             onClick={() => handleClickDimension("2D")}> 2 Dimension
           </button>
-          <button id="dimension-isSelected-button" 
+          <button id={buttonStyles["dimension-isSelected-button"]} 
             className={`${selectedDimension === "3D" ? "dimension-notSelected-button" : ""}`}
             onClick={() => handleClickDimension("3D")}> 3 Dimension
           </button>
@@ -113,7 +119,7 @@ export default function Modal({ onClose, onSubmit }) {
 
 
           <div style={{ display: "flex", justifyContent: "center", gap: "30px", marginTop: "30px", alignItems: "flex-start" }}>
-          <button type="button" className="add-file-button" onClick={handleClick}>Upload</button>
+          <button type="button" className={buttonStyles["add-file-button"]} onClick={handleClick}>Upload</button>
           <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: "none" }} />
           {/* 📄 File List (Small Left Panel) */}
           <div style={{
@@ -164,7 +170,7 @@ export default function Modal({ onClose, onSubmit }) {
 
           {/* 📤 Upload + Create Buttons */}
           <div style={{ display: "flex", marginTop: "10px", marginLeft: "100px",flexDirection: "column", gap: "30px", alignItems: "center" }}>
-            <button type="submit" className="add-file-button">Submit</button>
+            <button type="submit" className={buttonStyles["add-file-button"]}>Submit</button>
           </div>
         </div>
         </form>
