@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import React, {useRef} from "react";
 import { useNavigate } from "react-router-dom";
-import "./button.css";
+import ButtonStyles from "./navbarButton.module.css"
 import ExportButton from "./ExportButton";
 
 export default function Sidebar({ chats, setChats ,setShowModal }) {
@@ -14,6 +14,10 @@ export default function Sidebar({ chats, setChats ,setShowModal }) {
   const handleUploadClick = () => {
     fileInputRef.current.click();
   };
+
+  function removeChat(id) {
+    setChats(prev => prev.filter(chat => chat.id !== id));
+  }  
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -73,8 +77,8 @@ export default function Sidebar({ chats, setChats ,setShowModal }) {
         <img src="/brain_icon.png" alt="brain" width="50px" />
       </Link>
       <br></br>
-      <button id="new-case-button" onClick={() => setShowModal(true)}>+ New case</button>
-      <button id="upload-button" onClick={handleUploadClick} >Upload file</button>
+      <button id={ButtonStyles["new-case-button"]} onClick={() => setShowModal(true)}>+ New case</button>
+      <button id={ButtonStyles["upload-button"]} onClick={handleUploadClick} >Upload chat</button>
       <input
         type="file"
         accept=".json"
@@ -88,12 +92,13 @@ export default function Sidebar({ chats, setChats ,setShowModal }) {
         return (
           <div
             key={index}
-            className={`chat-link-box ${isActive ? "active-chat" : ""}`}
+            className={`${ButtonStyles["chat-link-box"]} ${isActive ? ButtonStyles["active-chat"] : ""}`}
           >
-            <Link className="chat-link" to={`/chat/${chat.id}`}>
+            <Link className={ButtonStyles["chat-link"]} to={`/chat/${chat.id}`}>
               <div title={chat.topic} style={{ display: "flex", alignItems: "center" }}>
                 <ExportButton chat={chat} />
-                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginLeft: "10px" }}>
+                   <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "flex-start", marginLeft: "10px" }}>
+                    <button className={ButtonStyles["close-button"]} onClick={() => removeChat(chat.id)} style={{position: "absolute", left: "105px", bottom: "25px"}}></button>
                     <div style={{ fontSize: "14px", fontWeight: "bold", textOverflow: "ellipsis", maxWidth: "120px", overflow: "hidden", whiteSpace: "nowrap" }}>{chat.topic}</div>
                     <div style={{ fontSize: "12px", color: "black", fontWeight: "lighter" }}>uncase ({chat.content.selectedDimension})</div>
                   </div>
