@@ -12,13 +12,17 @@ export default function App() {
   const [chats, setChats] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
-
+  
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
-
+  
   // Handler for creating new chat from modal submit
   async function createNewChat(topic, content) {
+    
+    const is3D = content.selectedDimension === "3D";
+    const is2D = content.selectedDimension === "2D";
+    
     const chatId = uuidv4();
 
     // Step 1: Add new chat immediately
@@ -51,7 +55,7 @@ export default function App() {
           formData.append(key, value);
         }
       });
-
+      
       const res = await fetch("http://localhost:8000/submit_case", {
         method: "POST",
         body: formData,
@@ -70,6 +74,21 @@ export default function App() {
       const geminiData = await geminiRes.json();
       const aiReply = geminiData.reply || "❌ Failed to connect AI.";
 
+      // Assume backend returns .images only for 2D, and maybe slices or imageURL for 3D
+      let conversation = [{ sender: "ai", text: "✅ Case processed successfully." }];
+
+      if (is2D && data.images?.length) {
+        conversation.push({ sender: "ai", text: "🖼️ Detected 2D images from your file." });
+      }
+
+      if (is3D) {
+        conversation.push({ sender: "ai", text: "🧠 Detected 3D scan (NIfTI). Opening viewer..." });
+      }
+
+      conversation.push({ sender: "ai", text: `Doctor name is ${content.doctorFirstName} ${content.doctorLastName}\nPatient name is ${content.patientFirstName} ${content.patientLastName}` });
+      conversation.push({ sender: "ai", text: aiReply });
+
+      console.log("Backend returned images:", data.images);
 
       // Step 4: Update conversation in chat
       setChats((prevChats) =>
@@ -79,14 +98,9 @@ export default function App() {
                 ...c,
                 content: {
                   ...c.content,
-                  imageUrls: data.images || [],
+                  imageUrls: is2D ? data.images || [] : [], // only attach for 2D
                 },
-                conversation: [
-                  { sender: "ai", text: "✅ Case processed successfully." },
-                  { sender: "ai", 
-                    text: (`Doctor name is ${c.topic}\nPatient name is ${c.patientFirstName} ${c.patientLastName}`)},
-                  { sender: "ai", text: aiReply },
-                ],
+                conversation: conversation,
               }
             : c
         )

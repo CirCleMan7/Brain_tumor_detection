@@ -91,12 +91,12 @@ export default function Modal({ onClose, onSubmit, chats }) {
         <img src="../../public/brain_image.png" alt="brain_image" style={{position: "absolute", width: "130px", marginBottom: "0px"}}></img>
         <button className={buttonStyles["close-button"]} onClick={onClose}></button>
         <div className="input-box">
-          <button id={buttonStyles["dimension-isSelected-button"]}
-            className={`${selectedDimension === "2D" ? "dimension-notSelected-button" : ""}`}
+          <button
+            className={`${buttonStyles["dimension-button"]} ${selectedDimension === "2D" ? buttonStyles["dimension-selected-button"] : ""}`}
             onClick={() => handleClickDimension("2D")}> 2 Dimension
           </button>
-          <button id={buttonStyles["dimension-isSelected-button"]} 
-            className={`${selectedDimension === "3D" ? "dimension-notSelected-button" : ""}`}
+          <button 
+            className={`${buttonStyles["dimension-button"]} ${selectedDimension === "3D" ? buttonStyles["dimension-selected-button"] : ""}`}
             onClick={() => handleClickDimension("3D")}> 3 Dimension
           </button>
         </div>

@@ -73,23 +73,23 @@
     height: 100px;
   }
   
-#dimension-isSelected-button {
+
+.dimension-button {
     position: relative;
+    cursor: pointer;
     width: 261px;
     height: 51px;
     margin-top: 25px;
     margin-bottom: 25px;
     border-radius: 15px;
-    border-color: black;
-    border-style: solid;
-    border-width: 1px;
+    border: 1px solid black;
+} 
+
+.dimension-button:hover {
+    background-color: #88b7c2;
 }
 
-#dimension-isSelected-button:hover {
-    background-color: #b7daff;
-}
-
-.dimension-notSelected-button {
+.dimension-selected-button {
     background-color: #60afc1;
     color: white;
 }
