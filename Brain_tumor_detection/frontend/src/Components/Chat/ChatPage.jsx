@@ -14,13 +14,16 @@ export default function ChatPage({ chats, setChats, showModal }) {
   // Initialize conversation state with chat conversation if exists
   const [conversation, setConversation] = useState(chat?.conversation || []);
   const [input, setInput] = useState("");
+  const [showImage, setShowImage] = useState(false);
 
   // Update conversation whenever chat changes (like switching chats)
   useEffect(() => {
     setConversation(chat?.conversation || []);
   }, [chat]);
 
-  
+  useEffect(() => {
+    setShowImage(false);
+  }, [chat?.content?.selectedDimension]) 
   
   const [abortController, setAbortController] = useState(null);
   
@@ -149,7 +152,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
       
       window.papaya = window.papaya || {};
       window.papaya.params = {
-        images: ["/avg152T1_LR_nifti.nii.gz"]
+        images: ["/Users/sakonkiat/Desktop/SuperAI-Brain_Tumor/fastapi-brain-segmentation/data/BraTS20_Training_002_flair.nii"]
       };
       
       const papayaScript = document.createElement("script");
@@ -231,7 +234,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
     
   // ==============================================================================
   
-  const [showImage, setShowImage] = useState(false);
+  
 
   // ==============================================================================
   // for make a scroll page only 2D 
@@ -312,7 +315,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
             <>
               <PapayaViewer />
               <div className="arrow left" onClick={() => setShowImage(false)} />
-            </>
+              </>
             // </div>
           )}
         </div>
@@ -321,7 +324,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
       {/* Right: Chat Section */}
       <div className="chat-container">
         {/* Toggle button when image is hidden */}
-        {!showImage && (
+        {!showImage && (imageFiles.length > 0 || chat.content.selectedDimension == "3D") && (
           <div
             style={styles.toggleButton}
             className="arrow right"
