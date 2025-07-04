@@ -7,20 +7,26 @@ export default function PapayaViewer() {
   useEffect(() => {
     loadPapayaScript()
       .then(() => {
-        if (document.querySelector(".papaya")) {
+        const papayaDiv = document.querySelector(".papaya");
+        if (papayaDiv && window.papaya) {
           window.papaya.Container.startPapaya();
           setLoaded(true);
-        } else {
-          console.warn("Papaya div not found");
         }
       })
       .catch(console.error);
   }, []);
 
+  // useEffect(() => {
+  //   if (loaded && window.papaya?.Container) {
+  //     setTimeout(() => {
+  //       window.papaya.Container.resizeViewerComponents();
+  //     }, 200);
+  //   }
+  // }, [loaded]);
+
   return (
-    <div>
-      <h1>Papaya Viewer</h1>
-      <div className="papaya" style={{ width: 800, height: 600, margin: "auto" }} />
+    <div className="viewer-wrapper">
+      <div className="papaya" style={{ width: "100%", height: "100%" }} />
       {!loaded && <p>Loading Papaya...</p>}
     </div>
   );

@@ -5,6 +5,7 @@ import "./chat.css";
 import "./arrow.css";
 import ChatInput from "./ChatInput";
 import PapayaViewer from "./../PapayaViewer"
+import Show2DImage from "./show2DImage";
 
 export default function ChatPage({ chats, setChats, showModal }) {
   const { id } = useParams();
@@ -19,8 +20,10 @@ export default function ChatPage({ chats, setChats, showModal }) {
     setConversation(chat?.conversation || []);
   }, [chat]);
 
+  
+  
   const [abortController, setAbortController] = useState(null);
-
+  
   
   async function getGeminiMessage(userPrompt) {
     const controller = new AbortController();
@@ -102,10 +105,15 @@ export default function ChatPage({ chats, setChats, showModal }) {
   
   const bottomRef = useRef();
   const chatLogRef = useRef();
+  
+  // ==============================================================================
+  // for auto going down when typing
+  
   const [showScrollButton, setShowScrollButton] = useState(false);
   
   useEffect(() => {
     const chatLog = chatLogRef.current;
+    if (!chatLog) return;
     
     const handleScroll = () => {
       const isAtBottom =
@@ -113,9 +121,17 @@ export default function ChatPage({ chats, setChats, showModal }) {
       setShowScrollButton(!isAtBottom);
     };
     
-    chatLog?.addEventListener("scroll", handleScroll);
-    return () => chatLog?.removeEventListener("scroll", handleScroll);
-  }, []);
+    chatLog.addEventListener("scroll", handleScroll);
+    return () => chatLog.removeEventListener("scroll", handleScroll);
+  }, [conversation]);
+  
+  // useEffect(() => {
+  // if (!showScrollButton && bottomRef.current) {
+  //     bottomRef.current.scrollIntoView("smooth");
+  //   }
+  // }, [conversation]);
+  // ==============================================================================
+  // papaya viewer
   
   useEffect(() => {
     const jqueryScript = document.createElement("script");
@@ -190,61 +206,55 @@ export default function ChatPage({ chats, setChats, showModal }) {
     };
   }, []);
   
+  useEffect(() => {
+    // Start Papaya on mount
+    if (
+      window.papaya &&
+      window.papaya.Container &&
+      document.querySelector(".papaya")
+      ) {
+        window.papaya.Container.startPapaya();
+        setTimeout(() => {
+          window.papaya.Container.resizeViewerComponents(); // 🪄 Fix layout glitch
+        }, 300);
+      }
+      
+      // Clean up on unmount
+      return () => {
+        if (
+            window.papaya?.Container?.viewer?.length > 0
+          ) {
+            window.papaya.Container.resetViewer(0, true);
+          }
+        };
+      }, []);
+    
+  // ==============================================================================
+  
   const [showImage, setShowImage] = useState(false);
 
-  const imageFiles = [
-    // AI generated images (usually base64 or URLs)
-    ...(chat?.content?.imageUrls?.map((url, i) => ({
-      url,
-      name: `AI_generated_${i + 1}.png`,
-      type: "image/ai",
-    })) || []),
-    
-    // Uploaded images (png, jpg, jpeg)
-    ...(chat?.content?.files
-      ?.filter(f => f.url && /\.(png|jpe?g)$/i.test(f.name))
-      ?.map(f => ({
-        url: f.url,
-        name: f.name,
-        type: f.type || "image/unknown",
-      })) || []),
-    ];
-    
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    
-    // for input select image by input num
-    const [imageInput, setImageInput] = useState(currentImageIndex + 1);
-    useEffect(() => {
-      setImageInput(currentImageIndex + 1);
-    }, [currentImageIndex]);  
-    
-  const handlePrev = () => {
-    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : prev));
-  };
+  // ==============================================================================
+  // for make a scroll page only 2D 
 
-  const handleNext = () => {
-    setCurrentImageIndex((prev) =>
-      prev < imageFiles.length - 1 ? prev + 1 : prev
-    );
-  };
+  const imageFiles = [
+  // AI generated images (usually base64 or URLs)
+  ...(chat?.content?.imageUrls?.map((url, i) => ({
+    url,
+    name: `AI_generated_${i + 1}.png`,
+    type: "image/ai",
+  })) || []),
+  
+  // Uploaded images (png, jpg, jpeg)
+  ...(chat?.content?.files
+    ?.filter(f => f.url && /\.(png|jpe?g)$/i.test(f.name))
+    ?.map(f => ({
+      url: f.url,
+      name: f.name,
+      type: f.type || "image/unknown",
+    })) || []),
+  ];
 
   const styles = {
-    fixedContainer: {
-      position: "sticky",
-      top: "20px",
-      // left: "49px",
-      marginLeft: "49%",
-      transform: "translateX(-50%)",
-      width: "90%",          // responsive width
-      maxWidth: "1000px",    // max width so it doesn't get too big on big screens
-      background: "white",
-      borderRadius: "12px",
-      padding: "10px",
-      cursor: "pointer",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-      zIndex: 999,
-      textAlign: "center",
-    },
     image: {
       maxWidth: "400px",
       height: "auto",
@@ -260,8 +270,9 @@ export default function ChatPage({ chats, setChats, showModal }) {
       fontSize: "20px",
     },
     toggleButton: {
-      position: "fixed",
-      left: "57%",
+      position: "absolute",
+      left: "-30px",
+      top: "40%",
       cursor: "pointer",
       zIndex: 998,
     },
@@ -289,242 +300,63 @@ export default function ChatPage({ chats, setChats, showModal }) {
     );
   }
 
-  console.log(`Dimension : ${chat?.content?.selectedDimension}`)
-
-  // return (
-  //   <div className="chat-page">
-
-  //     {showImage && chat?.content?.selectedDimension === "2D" && (
-  //       <div style={styles.fixedContainer}>
-  //         (
-  //           <>
-  //             {/* Image Navigation */}
-  //             <div style={styles.imageNavContainer}>
-  //               {/* Left Arrow */}
-  //               <div style={styles.arrowWrapperLeft} onClick={handlePrev}>
-  //                 <div className="arrow left" />
-  //               </div>
-
-  //               {/* Image */}
-  //               <img
-  //                 src={imageFiles[currentImageIndex].url}
-  //                 alt={`Image ${currentImageIndex + 1}`}
-  //                 style={styles.image}
-  //               />
-
-  //               {/* Right Arrow */}
-  //               <div style={styles.arrowWrapperRight} onClick={handleNext}>
-  //                 <div className="arrow right" />
-  //               </div>
-  //             </div>
-
-  //             {/* Image Counter */}
-  //             <div style={styles.counterText}>
-  //               {currentImageIndex + 1} / {imageFiles.length}
-  //             </div>
-  //           </>
-  //         )
-
-  //         {/* Close Image View */}
-  //         <div style={styles.arrow} className="arrow up" onClick={() => setShowImage(false)} />
-  //       </div>
-  //     )}
-      
-  //     {showImage && chat?.content?.selectedDimension === "3D" && (
-  //       <>
-  //         <PapayaViewer />
-  //         <div style={styles.arrow} className="arrow up" onClick={() => setShowImage(false)} />
-  //       </>
-  //     )}
-
-  //     {!showImage && (
-  //       <div style={styles.toggleButton} className="arrow down" onClick={() => setShowImage(true)}></div>
-  //     )}
-
-  //   {/* Add key here for instant chat switch */}
-  //   <div key={chat.id} className="chat-log" ref={chatLogRef}>
-  //   {conversation.map((msg, index) => (
-  //     <div key={index} className={`message ${msg.sender}`}>
-  //       <div className="message-content">
-  //         {msg.sender === "ai" && (
-  //           <>
-  //             <img src="/ai-icon.png" className="ai-icon"></img>
-  //             <div className="sender-name">AI Brain Expert</div>
-  //           </>
-  //         )}
-  //         <div className="bubble">
-  //           {msg.sender === "ai" ? (
-  //             <ReactMarkdown>{msg.text}</ReactMarkdown>
-  //           ) : (
-  //             <ReactMarkdown>{msg.text}</ReactMarkdown>
-  //           )}
-  //         </div>
-  //       </div>
-  //     </div>
-  //   ))}
-
-  //     <div ref={bottomRef} />
-  //   </div>
-
-  //   <ChatInput input={input} setInput={setInput} handleSend={handleSend} isTyping={isTyping} cancelTyping={cancelTyping} disabled={conversation.length <= 1} chat={chat}></ChatInput>
-  // </div>
-  // );
-
   return (
-    <div className="chat-page">
-      {chat?.content?.selectedDimension === "3D" ? (
-        // 🎯 3D Layout (Split Screen)
-        <div style={{ display: "flex", height: "100vh" }}>
-          {/* Left: Chat */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "20px" }}>
-            {/* 🧠 Chat Messages */}
-            <div key={chat.id} className="chat-log" ref={chatLogRef}>
-              {conversation.map((msg, index) => (
-                <div key={index} className={`message ${msg.sender}`}>
-                  <div className="message-content">
-                    {msg.sender === "ai" && (
-                      <>
-                        <img src="/ai-icon.png" className="ai-icon" />
-                        <div className="sender-name">AI Brain Expert</div>
-                      </>
-                    )}
-                    <div className="bubble">
-                      <ReactMarkdown>{msg.text}</ReactMarkdown>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <div ref={bottomRef} />
-            </div>
-  
-            {/* ✏️ Input */}
-            <ChatInput
-              input={input}
-              setInput={setInput}
-              handleSend={handleSend}
-              isTyping={isTyping}
-              cancelTyping={cancelTyping}
-              disabled={conversation.length <= 1}
-              chat={chat}
-            />
-          </div>
-  
-          {/* Right: Papaya Viewer */}
-          <div
-            style={{
-              width: "50%",
-              minWidth: "500px",
-              borderLeft: "1px solid #ccc",
-              padding: "10px",
-              overflow: "auto",
-            }}
-          >
-            <PapayaViewer />
-          </div>
+    <div className={`chat-page ${showImage ? "row-layout" : ""}`}>
+      {/* Left: Viewer */}
+      {showImage && (
+        <div className="viewer-container">
+          {chat?.content?.selectedDimension === "2D" ? (
+            <Show2DImage setShowImage={setShowImage} imageFiles={imageFiles} />
+          ) : (
+            // <div className="viewer-wrapper">
+            <>
+              <PapayaViewer />
+              <div className="arrow left" onClick={() => setShowImage(false)} />
+            </>
+            // </div>
+          )}
         </div>
-      ) : (
-        // 🎯 2D Layout (Full Chat)
-        <>
-          {/* Floating image viewer (like your style) */}
-          {showImage && (
-            <div style={styles.fixedContainer}>
-              {/* Image Navigation */}
-              <div style={styles.imageNavContainer}>
-                {/* Left Arrow */}
-                <div onClick={handlePrev}>
-                  <div className="arrow left" />
-                </div>
-            
-                {/* Image Preview */}
-                <img
-                  src={imageFiles[currentImageIndex]?.url}
-                  alt={`Image ${currentImageIndex + 1}`}
-                  style={styles.image}
-                />
-            
-                {/* Right Arrow */}
-                <div onClick={handleNext}>
-                  <div className="arrow right" />
-                </div>
-              </div>
-            
-              {/* Image Index Input */}
-              <div style={{ marginTop: "10px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
-                <span>Go to:</span>
-                <input
-                  type="number"
-                  min="1"
-                  max={imageFiles.length}
-                  value={imageInput}
-                  onChange={(e) => {
-                    setImageInput(e.target.value); // allow typing
-                  }}
-                  onBlur={() => {
-                    const num = parseInt(imageInput);
-                    if (!isNaN(num) && num >= 1 && num <= imageFiles.length) {
-                      setCurrentImageIndex(num - 1); // apply change on blur
-                    } else {
-                      setImageInput(currentImageIndex + 1); // reset if invalid
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.target.blur(); // trigger onBlur logic
-                    }
-                  }}
-                  style={{ width: "60px", padding: "4px", textAlign: "center" }}
-                />
-                <span>/ {imageFiles.length}</span>
-              </div>
-            
-              {/* Close Image Viewer */}
-              <div
-                style={styles.arrow}
-                className="arrow up"
-                onClick={() => setShowImage(false)}
-              />
-            </div>
-          )}
-  
-          {!showImage && (
-            <div
-              style={styles.toggleButton}
-              className="arrow down"
-              onClick={() => setShowImage(true)}
-            />
-          )}
-  
-          {/* 🧠 Fullscreen Chat Area */}
-          <div key={chat.id} className="chat-log" ref={chatLogRef}>
-            {conversation.map((msg, index) => (
-              <div key={index} className={`message ${msg.sender}`}>
-                <div className="message-content">
-                  {msg.sender === "ai" && (
-                    <>
-                      <img src="/ai-icon.png" className="ai-icon" />
-                      <div className="sender-name">AI Brain Expert</div>
-                    </>
-                  )}
-                  <div className="bubble">
-                    <ReactMarkdown>{msg.text}</ReactMarkdown>
-                  </div>
-                </div>
-              </div>
-            ))}
-            <div ref={bottomRef} />
-          </div>
-  
-          <ChatInput
-            input={input}
-            setInput={setInput}
-            handleSend={handleSend}
-            isTyping={isTyping}
-            cancelTyping={cancelTyping}
-            disabled={conversation.length <= 1}
-            chat={chat}
-          />
-        </>
       )}
+
+      {/* Right: Chat Section */}
+      <div className="chat-container">
+        {/* Toggle button when image is hidden */}
+        {!showImage && (
+          <div
+            style={styles.toggleButton}
+            className="arrow right"
+            onClick={() => setShowImage(true)}
+          />
+        )}
+
+        <div key={chat.id} className="chat-log" ref={chatLogRef}>
+          {conversation.map((msg, index) => (
+            <div key={index} className={`message ${msg.sender}`}>
+              <div className="message-content">
+                {msg.sender === "ai" && (
+                  <>
+                    <img src="/ai-icon.png" className="ai-icon" alt="AI Icon" />
+                    <div className="sender-name">AI Brain Expert</div>
+                  </>
+                )}
+                <div className="bubble">
+                  <ReactMarkdown>{msg.text}</ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <ChatInput
+          input={input}
+          setInput={setInput}
+          handleSend={handleSend}
+          isTyping={isTyping}
+          cancelTyping={cancelTyping}
+          disabled={conversation.length <= 1}
+          chat={chat}
+        />
+      </div>
     </div>
-  );  
+  )
 }

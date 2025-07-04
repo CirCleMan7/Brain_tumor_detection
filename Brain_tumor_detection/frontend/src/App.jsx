@@ -43,9 +43,6 @@ export default function App() {
     navigate(`/chat/${chatId}`);
 
     // Step 3: Process backend (first submit_case, then gemini)
-    console.log("slepp");
-    await sleep(3000);
-    console.log("wake up");
     try {
       const formData = new FormData();
       Object.entries(content).forEach(([key, value]) => {

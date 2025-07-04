@@ -1,54 +1,141 @@
+/* Base Container for the Chat Input - Minimalist */
 .chat-input-container {
-    position: fixed;
-    bottom: 20px;
-    width: 80%;
-    height: 140px; /* container height */
-    padding: 30px;
-    box-sizing: border-box;
+  position: fixed;
+  bottom: 0; /* Align to the very bottom */
+  left: 0;
+  right: 0;
+  width: 100%; /* Full width */
+  padding: 15px 20px; /* Padding on sides, slightly less top/bottom */
+  box-sizing: border-box;
+  /* background-color: #f7f7f7; Very light background for the strip */
+  /* border-top: 1px solid #e0e0e0; Subtle top border */
+  /* Removed box-shadow and border-radius from container as it's a full-width strip */
+  display: flex; /* Use flexbox for internal layout */
+  align-items: center; /* Vertically align items */
+  min-height: 70px; /* Minimum height for the container */
+  justify-content: center; /* Center the inner content if it's not 100% width */
 }
 
+/* Inner Wrapper for Textarea and Button - This will be the main visible element */
 .chat-input-inner {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-  }
+  width: clamp(300px, 90%, 900px); /* Responsive width for the pill itself */
+  display: flex;
+  gap: 0; /* No gap needed as button is inside wrapper */
+  align-items: center; /* Vertically align items inside this wrapper */
+  background-color: white; /* White background for the input pill */
+  border-radius: 30px; /* Highly rounded corners for the pill shape */
+  border: 1px solid #e0e0e0; /* Very light border */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); /* Soft, subtle shadow */
+  padding: 8px 12px; /* Padding inside the pill, around the text and button */
+}
 
-  .textarea-wrapper {
-    border-radius: 15px;
-    border: 1px solid #0c0b0b;
-    overflow: hidden;
-    width: 90%;
-    background-color: white;
-  }  
-  
-  .chat-textarea {
-    width: 100%;
-    min-height: 40px;
-    max-height: 120px;
-    /* margin: 8px 1px 8px 8px; */
-    padding: 10px;
-    resize: none;
-    overflow-y: auto;
-    font-size: 14px;
-    box-sizing: border-box;
+/* Wrapper for the Textarea */
+.textarea-wrapper {
+  flex-grow: 1; /* Allows textarea to take available space */
+  overflow: hidden;
+  background-color: transparent; /* No background here, it's on .chat-input-inner */
+  border: none; /* No border here */
+  box-shadow: none; /* No inner shadow here */
+  display: flex;
+  align-items: center;
+  padding: 0; /* Remove padding as it's on .chat-input-inner now */
+}
 
-    /* Add these to remove border */
-    border: none;
-    outline: none; /* optional: removes focus outline */
-    background: transparent; /* if used inside styled wrapper */
-  }
-  
-  .send-button {
-    padding: 8px 12px;
-    font-weight: bold;
-    border: none;
-    background-color: #1976d2;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  
+/* The Chat Textarea */
+.chat-textarea {
+  width: 100%;
+  min-height: 24px; /* Slightly smaller min-height for single line */
+  max-height: 120px;
+  padding: 0; /* No padding here, handled by .chat-input-inner and placeholder */
+  resize: none;
+  overflow-y: auto;
+  font-size: 16px;
+  line-height: 1.5; /* Good line height for readability */
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Arial', sans-serif; /* A simple, common font */
+  color: #333;
+  padding-right: 10px; /* Some right padding to separate from button area */
+}
+
+/* Placeholder styling for textarea */
+.chat-textarea::placeholder {
+  color: #a0a0a0; /* Lighter grey for placeholder */
+  font-style: normal; /* No italics as in your image */
+  font-size: 16px;
+}
+
+/* Scrollbar styling for Webkit browsers */
+.chat-textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-textarea::-webkit-scrollbar-track {
+  background: transparent; /* Transparent track */
+  border-radius: 10px;
+}
+
+.chat-textarea::-webkit-scrollbar-thumb {
+  background: #ccc; /* Lighter scrollbar thumb */
+  border-radius: 10px;
+}
+
+.chat-textarea::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+
+/* The Send Button (now an icon button) */
+.send-button {
+  flex-shrink: 0; /* Prevent button from shrinking */
+  width: 36px; /* Fixed width for circular button */
+  height: 36px; /* Fixed height for circular button */
+  border-radius: 50%; /* Make it perfectly circular */
+  border: none;
+  background-color: #6a82d2; /* A shade of blue similar to your image */
+  color: white; /* Icon color */
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Soft shadow for the button */
+  font-size: 18px; /* Size for the icon, assuming it's a font icon or SVG */
+  padding: 0; /* Remove padding as width/height define size */
+}
+
+.send-button:hover {
+  background-color: #5b74c0; /* Darker blue on hover */
+  transform: translateY(-0.5px); /* Very subtle lift */
+}
+
+.send-button:active {
+  background-color: #4c5d9c; /* Even darker on active */
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.send-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Styles for the send icon (assuming a font icon like Font Awesome or Material Icons) */
+.send-button i {
+  transform: rotate(45deg); /* Rotate for the paper airplane effect */
+  margin-top: -2px; /* Adjust vertical alignment for the rotated icon */
+  margin-left: 2px; /* Adjust horizontal alignment */
+}
+
+/* If you are using an SVG directly in the button */
+.send-button svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor; /* Inherit color from button's text color */
+  transform: rotate(45deg);
+  margin-top: -2px;
+  margin-left: 2px;
+}
