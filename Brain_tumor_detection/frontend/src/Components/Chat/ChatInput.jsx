@@ -20,7 +20,7 @@ export default function ChatInput({ input, setInput, handleSend, isTyping, cance
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault(); // prevent newline
-      if (!isTyping) {
+      if (!isTyping) { // Only send if not currently typing
         handleSend();
       }
     }
@@ -37,16 +37,24 @@ export default function ChatInput({ input, setInput, handleSend, isTyping, cance
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               className="chat-textarea"
-              disabled= {disabled}
+              // disabled={disabled} // Use the disabled prop directly
             />
           </div>
-          {/* <button onClick={handleSend} className="send-button">Send</button> */}
           <button
             onClick={isTyping ? cancelTyping : handleSend}
-            disabled={isTyping && !cancelTyping} // Optional: disable if canceling isn't allowed
-            className={`chat-submit-button ${isTyping ? "cancel" : ""}`}
+            // Disable button if input is empty AND not currently typing (to prevent sending empty messages)
+            // Or if disabled prop is true
+            // Or if isTyping is true AND cancelTyping is NOT provided (cannot cancel)
+            disabled={disabled || (!input.trim() && !isTyping) || (isTyping && !cancelTyping)}
+            className="send-button" // Use the 'send-button' class from CSS
           >
-            {isTyping ? "Cancel AI Response" : "Send"}
+            {isTyping ? (
+              // Icon for canceling AI response (e.g., a stop or cancel icon)
+              <i className="fas fa-stop-circle"></i> // Font Awesome stop icon
+            ) : (
+              // Icon for sending (paper plane)
+              <i className="fas fa-paper-plane"></i> 
+            )}
           </button>
       </div>
     </div>
