@@ -136,101 +136,101 @@ export default function ChatPage({ chats, setChats, showModal }) {
   // ==============================================================================
   // papaya viewer
   
-  useEffect(() => {
-    const jqueryScript = document.createElement("script");
-    jqueryScript.src = "https://code.jquery.com/jquery-3.6.0.min.js";
-    jqueryScript.async = true;
+  // useEffect(() => {
+  //   const jqueryScript = document.createElement("script");
+  //   jqueryScript.src = "https://code.jquery.com/jquery-3.6.0.min.js";
+  //   jqueryScript.async = true;
     
-    const cleanup = [];
+  //   const cleanup = [];
     
-    jqueryScript.onload = () => {
-      const css = document.createElement("link");
-      css.rel = "stylesheet";
-      css.href = "/papaya.css";
-      document.head.appendChild(css);
-      cleanup.push(() => document.head.removeChild(css));
+  //   jqueryScript.onload = () => {
+  //     const css = document.createElement("link");
+  //     css.rel = "stylesheet";
+  //     css.href = "/papaya.css";
+  //     document.head.appendChild(css);
+  //     cleanup.push(() => document.head.removeChild(css));
       
-      window.papaya = window.papaya || {};
-      window.papaya.params = {
-        images: ["/Users/sakonkiat/Desktop/SuperAI-Brain_Tumor/fastapi-brain-segmentation/data/BraTS20_Training_002_flair.nii"]
-      };
+  //     window.papaya = window.papaya || {};
+  //     window.papaya.params = {
+  //       images: ["/Users/sakonkiat/Desktop/SuperAI-Brain_Tumor/fastapi-brain-segmentation/data/BraTS20_Training_002_flair.nii"]
+  //     };
       
-      const papayaScript = document.createElement("script");
-      papayaScript.src = "/papaya.js";
-      papayaScript.async = true;
+  //     const papayaScript = document.createElement("script");
+  //     papayaScript.src = "/papaya.js";
+  //     papayaScript.async = true;
       
-      papayaScript.onerror = () => {
-        console.error("Failed to load papaya.js");
-      };
+  //     papayaScript.onerror = () => {
+  //       console.error("Failed to load papaya.js");
+  //     };
       
-      let timeout = setTimeout(() => {
-        console.warn("Papaya load timeout.");
-      }, 10000);
+  //     let timeout = setTimeout(() => {
+  //       console.warn("Papaya load timeout.");
+  //     }, 10000);
       
-      papayaScript.onload = () => {
-        clearTimeout(timeout);
+  //     papayaScript.onload = () => {
+  //       clearTimeout(timeout);
         
-        const waitForPapayaDiv = () => {
-          const maxTries = 20;
-          let tries = 0;
+  //       const waitForPapayaDiv = () => {
+  //         const maxTries = 20;
+  //         let tries = 0;
           
-          const interval = setInterval(() => {
-            const papayaDiv = document.querySelector(".papaya");
-            if (papayaDiv) {
-              clearInterval(interval);
+  //         const interval = setInterval(() => {
+  //           const papayaDiv = document.querySelector(".papaya");
+  //           if (papayaDiv) {
+  //             clearInterval(interval);
               
-              if (window.papaya.Container.viewer) {
-                window.papaya.Container.resetViewer(0, true);
-              }
+  //             if (window.papaya.Container.viewer) {
+  //               window.papaya.Container.resetViewer(0, true);
+  //             }
               
-              window.papaya.Container.startPapaya();
-            } else if (++tries >= maxTries) {
-              clearInterval(interval);
-              console.warn("Could not find .papaya div.");
-            }
-          }, 200);
-        };
+  //             window.papaya.Container.startPapaya();
+  //           } else if (++tries >= maxTries) {
+  //             clearInterval(interval);
+  //             console.warn("Could not find .papaya div.");
+  //           }
+  //         }, 200);
+  //       };
         
-        waitForPapayaDiv();
-      };
+  //       waitForPapayaDiv();
+  //     };
       
-      document.body.appendChild(papayaScript);
-      cleanup.push(() => document.body.removeChild(papayaScript));
-    };
+  //     document.body.appendChild(papayaScript);
+  //     cleanup.push(() => document.body.removeChild(papayaScript));
+  //   };
     
-    document.body.appendChild(jqueryScript);
-    cleanup.push(() => document.body.removeChild(jqueryScript));
+  //   document.body.appendChild(jqueryScript);
+  //   cleanup.push(() => document.body.removeChild(jqueryScript));
     
-    return () => {
-      cleanup.forEach((fn) => fn());
-      if (window.papaya && window.papaya.Container && window.papaya.Container.viewer) {
-        window.papaya.Container.resetViewer(0, true);
-      }
-    };
-  }, []);
+  //   return () => {
+  //     cleanup.forEach((fn) => fn());
+  //     if (window.papaya && window.papaya.Container && window.papaya.Container.viewer) {
+  //       window.papaya.Container.resetViewer(0, true);
+  //     }
+  //   };
+  // }, []);
   
-  useEffect(() => {
-    // Start Papaya on mount
-    if (
-      window.papaya &&
-      window.papaya.Container &&
-      document.querySelector(".papaya")
-      ) {
-        window.papaya.Container.startPapaya();
-        setTimeout(() => {
-          window.papaya.Container.resizeViewerComponents(); // 🪄 Fix layout glitch
-        }, 300);
-      }
+  // useEffect(() => {
+  //   // Start Papaya on mount
+  //   if (
+  //     window.papaya &&
+  //     window.papaya.Container &&
+  //     document.querySelector(".papaya")
+  //     ) {
+  //       window.papaya.Container.startPapaya();
+  //       setTimeout(() => {
+  //         window.papaya.Container.resizeViewerComponents(); // 🪄 Fix layout glitch
+  //       }, 300);
+  //     }
       
-      // Clean up on unmount
-      return () => {
-        if (
-            window.papaya?.Container?.viewer?.length > 0
-          ) {
-            window.papaya.Container.resetViewer(0, true);
-          }
-        };
-      }, []);
+  //     // Clean up on unmount
+  //     return () => {
+  //       if (
+  //           window.papaya?.Container?.viewer?.length > 0
+  //         ) {
+  //           window.papaya.Container.resetViewer(0, true);
+  //         }
+  //       };
+  //     }, []);
     
   // ==============================================================================
   

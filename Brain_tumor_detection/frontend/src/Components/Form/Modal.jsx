@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import "./Modal.css";
-import InputBox from "./InputBox";
-import InputArea from "./InputArea";
+import "./formStyle.css";
 import buttonStyles from "./FormButton.module.css";
 
 export default function Modal({ onClose, onSubmit, chats }) {
@@ -12,11 +11,11 @@ export default function Modal({ onClose, onSubmit, chats }) {
   const [patientId, setPatientId] = useState("");
   const [sampleCollectionDate, setSampleCollectionDate] = useState("");
   const [testIndication, setTestIndication] = useState("");
-
-  const [files, setFiles] = useState([]);
-  const fileInputRef = useRef(null);
-
   const [selectedDimension, setSelectedDimension] = useState("2D");
+  const [flairFiles, setFlairFiles] = useState([]);
+  const [t1ceFiles, setT1ceFiles] = useState([]);
+  const flairFileInputRef = useRef(null);
+  const t1ceFileInputRef = useRef(null);
 
   const handleClickDimension = (value) => {
     if (value !== selectedDimension) {
@@ -26,14 +25,11 @@ export default function Modal({ onClose, onSubmit, chats }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
     const topic = `${patientFirstName} ${patientLastName}`;
-
     if (chats.some(chat => chat.topic?.trim().toLowerCase() === topic?.trim().toLowerCase())) {
       alert("Topic already exists. Please choose another.");
       return;
     }
-  
     const content = {
       doctorFirstName,
       doctorLastName,
@@ -41,138 +37,194 @@ export default function Modal({ onClose, onSubmit, chats }) {
       sampleCollectionDate,
       testIndication,
       selectedDimension,
-      files,
+      flairFiles,
+      t1ceFiles,
     };
-  
-    onSubmit(topic, content); // Let App.jsx take over
+    onSubmit(topic, content);
   };
-  
-  function getFileIcon(fileName) {
-    const lower = fileName.toLowerCase();
-    if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "🖼️";
-    if (lower.endsWith(".nii")) return "🧠";
-    return "📁";
-  }
-  
-  function handleRemoveFile(index) {
-    setFiles(prev => prev.filter((_, i) => i !== index));
-  }
-  
-  function handleClick() {
-      fileInputRef.current.click();
-  }
 
-  function handleFileChange(event) {
+  const handleFlairClick = () => {
+    flairFileInputRef.current.click();
+  };
+
+  const handleT1ceClick = () => {
+    t1ceFileInputRef.current.click();
+  };
+
+  const handleFlairFileChange = (event) => {
     const newFiles = Array.from(event.target.files);
-  
-    // Validate file types
     const allowedFiles = newFiles.filter((file) => {
-      const isPDF = file.type === "application/pdf";
-      const isJPG = file.type.startsWith("image/jpeg");
-      const isPNG = file.type.startsWith("image/png");
-      const isNii = file.name.toLowerCase().endsWith(".nii");
-      return isPDF || isJPG || isPNG || isNii;
+      const isNii = file.name.toLowerCase().endsWith(".nii") || file.name.toLowerCase().endsWith(".nii.gz");
+      return isNii;
     });
-  
-    // Avoid duplicates by name
-    const allFiles = [...files, ...allowedFiles];
+    const allFiles = [...flairFiles, ...allowedFiles];
     const unique = Array.from(new Set(allFiles.map((f) => f.name))).map((name) =>
       allFiles.find((f) => f.name === name)
     );
-  
-    setFiles(unique);
-    event.target.value = null; // reset file input
-  }
-  
-  
+    setFlairFiles(unique);
+    event.target.value = null;
+  };
+
+  const handleT1ceFileChange = (event) => {
+    const newFiles = Array.from(event.target.files);
+    const allowedFiles = newFiles.filter((file) => {
+      const isNii = file.name.toLowerCase().endsWith(".nii") || file.name.toLowerCase().endsWith(".nii.gz");
+      return isNii;
+    });
+    const allFiles = [...t1ceFiles, ...allowedFiles];
+    const unique = Array.from(new Set(allFiles.map((f) => f.name))).map((name) =>
+      allFiles.find((f) => f.name === name)
+    );
+    setT1ceFiles(unique);
+    event.target.value = null;
+  };
+
+  const getFileIcon = (fileName) => {
+    const lower = fileName.toLowerCase();
+    if (lower.endsWith(".nii") || lower.endsWith(".nii.gz")) return "🧠";
+    return "📁";
+  };
+
+  const handleRemoveFlairFile = (index) => {
+    setFlairFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveT1ceFile = (index) => {
+    setT1ceFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <div className="modal-overlay">
-      <div className="modal-box">
-        <img src="../../public/brain_image.png" alt="brain_image" style={{position: "absolute", width: "130px", marginBottom: "0px"}}></img>
-        <button className={buttonStyles["close-button"]} onClick={onClose}></button>
-        <div className="input-box">
-          <button
-            className={`${buttonStyles["dimension-button"]} ${selectedDimension === "2D" ? buttonStyles["dimension-selected-button"] : ""}`}
-            onClick={() => handleClickDimension("2D")}> 2 Dimension
-          </button>
-          <button 
-            className={`${buttonStyles["dimension-button"]} ${selectedDimension === "3D" ? buttonStyles["dimension-selected-button"] : ""}`}
-            onClick={() => handleClickDimension("3D")}> 3 Dimension
-          </button>
-        </div>
+      <div className="container">
+        <button className="close-button" onClick={onClose} type="button"></button>
+        <div className="text">Information form</div>
         <form onSubmit={handleSubmit}>
-          <div className="input-box">
-            <InputBox info={patientFirstName} setTopic={setPatientFirstName} title={"ชื่อ (ผู้ป่วย)"} required={true} type={"text"}/>
-            <InputBox info={patientLastName} setTopic={setPatientLastName} title={"นามสกุล (ผู้ป่วย)"} required={true} type={"text"}/>
-          </div>
-          <div className="input-box">
-          <InputBox info={doctorFirstName} setTopic={setDoctorFirstName} title={"ชื่อจริง (แพทย์ผู้สั่งตรวจ)"} required={false} type={"text"}/>
-          <InputBox info={doctorLastName} setTopic={setDoctorLastName} title={"นามสกุล (แพทย์ผู้สั่งตรวจ)"} required={false} type={"text"}/>
-          </div>
-          <div className="input-box">
-          <InputBox info={patientId} setTopic={setPatientId} title={"รหัสประจำตัวผู้ป่วย"} required={false} type={"text"}/>
-          <InputBox info={sampleCollectionDate} setTopic={setSampleCollectionDate} title={"วันที่เก็บตัวอย่าง"} required={false} type={"date"}/>
-          </div>
-          <div className="input-box-area">
-            <InputArea info={testIndication} setTopic={setTestIndication} title={"ข้อบ่งชี้ในการตรวจ"} required={false}></InputArea>
+          <div className="form-row">
+            <div className="input-data">
+              <input type="text" value={patientFirstName} onChange={(e) => setPatientFirstName(e.target.value)} required />
+              <div className="underline"></div>
+              <label>Patient First Name</label>
+            </div>
+            <div className="input-data">
+              <input type="text" value={patientLastName} onChange={(e) => setPatientLastName(e.target.value)} required />
+              <div className="underline"></div>
+              <label>Patient Last Name</label>
+            </div>
           </div>
 
+          <div className="form-row">
+            <div className="input-data">
+              <input type="text" value={doctorFirstName} onChange={(e) => setDoctorFirstName(e.target.value)} />
+              <div className="underline"></div>
+              <label>Doctor First Name</label>
+            </div>
+            <div className="input-data">
+              <input type="text" value={doctorLastName} onChange={(e) => setDoctorLastName(e.target.value)} />
+              <div className="underline"></div>
+              <label>Doctor Last Name</label>
+            </div>
+          </div>
 
-          <div style={{ display: "flex", justifyContent: "center", gap: "30px", marginTop: "30px", alignItems: "flex-start" }}>
-          <button type="button" className={buttonStyles["add-file-button"]} onClick={handleClick}>Upload</button>
-          <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: "none" }} />
-          {/* 📄 File List (Small Left Panel) */}
-          <div style={{
-            maxWidth: '90%',
-            maxHeight: '120px',   // limit height
-            overflowX: 'auto',    // horizontal scrollbar
-            whiteSpace: 'nowrap', // keep images in one line
-            padding: '8px',
-            border: '1px solid #ccc',
-            borderRadius: '8px',
-            marginBottom: '10px',
-          }}>
-            <strong style={{ fontSize: "0.95rem", marginBottom: "4px", color: "#333" }}>Files</strong>
-            {files.map((file, index) => (
-              <div
-                key={index}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "6px 8px",
-                  borderRadius: "6px",
-                  backgroundColor: "#ffffff",
-                  boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", overflow: "hidden" }}>
-                  <span style={{ fontSize: "18px" }}>{getFileIcon(file.name)}</span>
-                  <div style={{ fontSize: "0.8rem", color: "#444", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "120px" }}>
-                    {file.name}
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleRemoveFile(index)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#dc3545",
-                    fontSize: "0.75rem",
-                    cursor: "pointer",
-                  }}
-                >
-                  ✖
-                </button>
+          <div className="form-row">
+            <div className="input-data">
+              <input type="text" value={patientId} onChange={(e) => setPatientId(e.target.value)} />
+              <div className="underline"></div>
+              <label>Patient ID</label>
+            </div>
+            <div className="input-data">
+              <input type="date" value={sampleCollectionDate} onChange={(e) => setSampleCollectionDate(e.target.value)} />
+              <div className="underline"></div>
+              <label>Sample Date</label>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="input-data textarea">
+              <textarea value={testIndication} style={{ width: "100%", height: "150px" }} onChange={(e) => setTestIndication(e.target.value)} required />
+              <div className="underline"></div>
+              <label>Write your message</label>
+            </div>
+          </div>
+
+          {/* FLAIR File Upload */}
+          <div className="form-row">
+            <div className="file-upload-section">
+              <div className="file-upload-header">
+                <h3>FLAIR Scan (.nii or .nii.gz):</h3>
+                <button type="button" onClick={handleFlairClick} className={buttonStyles["add-file-button"]}>Upload FLAIR</button>
               </div>
-            ))}
+              <input 
+                type="file" 
+                ref={flairFileInputRef} 
+                onChange={handleFlairFileChange} 
+                multiple 
+                accept=".nii,.nii.gz"
+                style={{ display: "none" }} 
+              />
+              <div className="file-list">
+                {flairFiles.map((file, index) => (
+                  <div key={index} className="file-item">
+                    <span>{getFileIcon(file.name)}</span>
+                    <span className="file-name">{file.name}</span>
+                    <button type="button" onClick={() => handleRemoveFlairFile(index)} className="remove-file-btn">✖</button>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* 📤 Upload + Create Buttons */}
-          <div style={{ display: "flex", marginTop: "10px", marginLeft: "100px",flexDirection: "column", gap: "30px", alignItems: "center" }}>
-            <button type="submit" className={buttonStyles["add-file-button"]}>Submit</button>
+          {/* T1CE File Upload */}
+          <div className="form-row">
+            <div className="file-upload-section">
+              <div className="file-upload-header">
+                <h3>T1CE Scan (.nii or .nii.gz):</h3>
+                <button type="button" onClick={handleT1ceClick} className={buttonStyles["add-file-button"]}>Upload T1CE</button>
+              </div>
+              <input 
+                type="file" 
+                ref={t1ceFileInputRef} 
+                onChange={handleT1ceFileChange} 
+                multiple 
+                accept=".nii,.nii.gz"
+                style={{ display: "none" }} 
+              />
+              <div className="file-list">
+                {t1ceFiles.map((file, index) => (
+                  <div key={index} className="file-item">
+                    <span>{getFileIcon(file.name)}</span>
+                    <span className="file-name">{file.name}</span>
+                    <button type="button" onClick={() => handleRemoveT1ceFile(index)} className="remove-file-btn">✖</button>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+
+          <div className="form-row">
+            <div style={{ display: "flex", gap: "15px", justifyContent: "center" }}>
+              <button
+                type="button"
+                className={`dimension-button ${selectedDimension === "2D" ? "dimension-selected-button" : ""}`}
+                onClick={() => handleClickDimension("2D")}
+              >
+                <span>2D Dimension</span>
+              </button>
+              <button
+                type="button"
+                className={`dimension-button ${selectedDimension === "3D" ? "dimension-selected-button" : ""}`}
+                onClick={() => handleClickDimension("3D")}
+              >
+                <span>3D Dimension</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="form-row submit-btn">
+            <div className="input-data">
+              <div className="inner"></div>
+              <input type="submit" value="submit" />
+            </div>
+          </div>
         </form>
       </div>
     </div>

@@ -32,58 +32,68 @@ app.add_middleware(
 
 @app.post("/gemini")
 async def ask_gemini(req: Request):
-    return {"error" : "NO"}
-    # try:
-    #     data = await req.json()
-    #     prompt = data.get("prompt")
-    #     print("Prompt received:", prompt)
+    # return {"error": "No prompt"}
+    try:
+        data = await req.json()
+        prompt = data.get("prompt")
+        print("📨 Prompt received:", prompt)
 
-    #     if not prompt or not prompt.strip():
-    #         return {"error": "No prompt provided"}
+        if not prompt or not prompt.strip():
+            return {"error": "No prompt provided"}
 
-    #     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
-    #     headers = {"Content-Type": "application/json"}
-    #     payload = {
-    #         "contents": [{"parts": [{"text": prompt}]}]
-    #     }
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
+        headers = {"Content-Type": "application/json"}
+        payload = {
+            "contents": [{"parts": [{"text": prompt}]}]
+        }
 
-    #     print("Payload:", payload)
+        print("📦 Sending to Gemini:", payload)
 
-    #     async with httpx.AsyncClient(timeout=30.0) as client:  # Wait up to 30 seconds
-    #         res = await client.post(url, headers=headers, json=payload)
-    #         print("Gemini status:", res.status_code)
-    #         print("Gemini response:", res.text)
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            res = await client.post(url, headers=headers, json=payload)
+            print("📬 Gemini status:", res.status_code)
+            print("📨 Raw response text:", res.text)
 
-    #         try:
-    #             res_json = res.json()
-    #         except Exception as e:
-    #             print("❌ Failed to parse JSON from Gemini:")
-    #             traceback.print_exc()
-    #             return {
-    #                 "error": "Invalid JSON from Gemini",
-    #                 "status": res.status_code,
-    #                 "raw_response": res.text
-    #             }
+            try:
+                res_json = res.json()
+            except Exception:
+                print("❌ Failed to parse JSON from Gemini")
+                traceback.print_exc()
+                return {
+                    "error": "Invalid JSON from Gemini",
+                    "status": res.status_code,
+                    "raw_response": res.text
+                }
 
-    #     try:
-    #         reply = res_json["candidates"][0]["content"]["parts"][0]["text"]
-    #         return {"reply": reply}
-    #     except Exception as e:
-    #         print("❌ Unexpected Gemini response structure:")
-    #         traceback.print_exc()
-    #         return {
-    #             "error": "Unexpected Gemini response format",
-    #             "data": res_json
-    #         }
+        try:
+            candidates = res_json.get("candidates", [])
+            if not candidates:
+                raise ValueError("Missing 'candidates'")
 
-    # except Exception as e:
-    #     print("❌ Outer exception occurred:")
-    #     traceback.print_exc()
-    #     return {
-    #         "error": "Internal server error",
-    #         "message": str(e),
-    #         "trace": traceback.format_exc()
-    #     }
+            content = candidates[0].get("content", {})
+            parts = content.get("parts", [])
+            if not parts or "text" not in parts[0]:
+                raise ValueError("Missing 'text' in parts")
+
+            reply = parts[0]["text"]
+            return {"reply": reply}
+
+        except Exception:
+            print("❌ Unexpected Gemini response structure")
+            traceback.print_exc()
+            return {
+                "error": "Unexpected Gemini response format",
+                "data": res_json
+            }
+
+    except Exception as e:
+        print("❌ Outer exception occurred:")
+        traceback.print_exc()
+        return {
+            "error": "Internal server error",
+            "message": str(e),
+            "trace": traceback.format_exc()
+        }
     
 
 import tempfile

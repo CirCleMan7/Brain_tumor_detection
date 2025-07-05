@@ -64,7 +64,7 @@ export default function Sidebar({ chats, setChats ,setShowModal }) {
     <div style={{
       width: "240px",
       height: "100vh",
-      backgroundColor: "#DFDFDF",
+      background: "linear-gradient(to right, #F8F8F8, #EFEFEF)",
       padding: "20px",
       position: "fixed",
       top: 0,
