@@ -7,6 +7,7 @@
 }
 
 .container{
+  position: relative;
   max-width: 800px;
   max-height: 90vh;
   background: #fff;
@@ -58,10 +59,11 @@ form .form-row .textarea{
   font-size: 14px;
   color: #495057;
 }
-.textarea textarea{
-  resize: none;
-  padding-top: 10px;
-}
+.textarea textarea {
+    resize: none;
+    margin-top: 30px; /* Increase this value for more space */
+  }
+  
 .input-data label{
   position: absolute;
   pointer-events: none;
@@ -108,10 +110,10 @@ form .form-row .textarea{
   width: 25%!important;
 }
 .submit-btn .input-data .inner{
+  position: absolute; 
   height: 100%;
   width: 300%;
-  position: absolute;
-  left: -100%;
+  /* left: -100%; */
   background: linear-gradient(right, #343a40, #495057, #6c757d, #495057);
   transition: all 0.4s;
 }
@@ -165,9 +167,9 @@ form .form-row .textarea{
 }
 
 .close-button {
-  position: absolute;
+  position: sticky;
   top: 15px;
-  right: 15px;
+  margin-left: 96%;
   width: 40px;
   height: 40px;
   border: none;
@@ -207,7 +209,7 @@ form .form-row .textarea{
   cursor: pointer;
   width: 120px;
   height: 45px;
-  border-radius: 25px;
+  border-radius: 5px;
   border: 2px solid #dee2e6;
   background: linear-gradient(135deg, #ffffff, #f8f9fa);
   color: #495057;
@@ -230,7 +232,7 @@ form .form-row .textarea{
   background: linear-gradient(135deg, #e9ecef, #dee2e6);
   opacity: 0;
   transition: opacity 0.3s ease;
-  border-radius: 23px;
+  border-radius: 5px;
 }
 
 .dimension-button span {
@@ -263,7 +265,7 @@ form .form-row .textarea{
 .dimension-selected-button:hover {
   background: linear-gradient(135deg, #495057, #6c757d);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(52, 58, 64, 0.4);
+  /* box-shadow: 0 6px 16px rgba(52, 58, 64, 0.4); */
 }
 
 /* Add File Button Styles */
@@ -433,18 +435,18 @@ form .form-row .textarea{
 
 /* Enhanced Submit Button Styles */
 .submit-btn .input-data {
+    position: relative;
     overflow: hidden;
     height: 50px !important;
-    width: 200px !important;
-    margin: 0 auto;
+    width: 100% !important;
+    margin-left: auto; /* Changed from margin: 0 auto */
     border-radius: 25px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     transition: all 0.4s ease;
-    position: relative;
-  }
+}
   
   .submit-btn .input-data:hover {
-    /* transform: translateY(-3px); */
+    transform: translateY(-3px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
   }
   

@@ -140,9 +140,28 @@ export default function Modal({ onClose, onSubmit, chats }) {
 
           <div className="form-row">
             <div className="input-data textarea">
-              <textarea value={testIndication} style={{ width: "100%", height: "150px" }} onChange={(e) => setTestIndication(e.target.value)} required />
+              <textarea value={testIndication} style={{ width: "100%", height: "120px" }} onChange={(e) => setTestIndication(e.target.value)} required />
               <div className="underline"></div>
               <label>Write your message</label>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div style={{ display: "flex", gap: "15px", justifyContent: "center", marginLeft: "17px" }}>
+              <button
+                type="button"
+                className={`dimension-button ${selectedDimension === "2D" ? "dimension-selected-button" : ""}`}
+                onClick={() => handleClickDimension("2D")}
+              >
+                <span>2D Dimension</span>
+              </button>
+              <button
+                type="button"
+                className={`dimension-button ${selectedDimension === "3D" ? "dimension-selected-button" : ""}`}
+                onClick={() => handleClickDimension("3D")}
+              >
+                <span>3D Dimension</span>
+              </button>
             </div>
           </div>
 
@@ -200,24 +219,6 @@ export default function Modal({ onClose, onSubmit, chats }) {
             </div>
           </div>
 
-          <div className="form-row">
-            <div style={{ display: "flex", gap: "15px", justifyContent: "center" }}>
-              <button
-                type="button"
-                className={`dimension-button ${selectedDimension === "2D" ? "dimension-selected-button" : ""}`}
-                onClick={() => handleClickDimension("2D")}
-              >
-                <span>2D Dimension</span>
-              </button>
-              <button
-                type="button"
-                className={`dimension-button ${selectedDimension === "3D" ? "dimension-selected-button" : ""}`}
-                onClick={() => handleClickDimension("3D")}
-              >
-                <span>3D Dimension</span>
-              </button>
-            </div>
-          </div>
 
           <div className="form-row submit-btn">
             <div className="input-data">
