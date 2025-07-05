@@ -5,7 +5,7 @@ import "./chat.css";
 import "./arrow.css";
 import ChatInput from "./ChatInput";
 import PapayaViewer from "./../PapayaViewer"
-import Show2DImage from "./show2DImage";
+import Show2DImage from "./Show2DImage";
 
 export default function ChatPage({ chats, setChats, showModal }) {
   const { id } = useParams();
