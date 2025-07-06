@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import "./Modal.css";
 import "./formStyle.css";
 import buttonStyles from "./FormButton.module.css";
 
@@ -53,10 +52,13 @@ export default function Modal({ onClose, onSubmit, chats }) {
 
   const handleFlairFileChange = (event) => {
     const newFiles = Array.from(event.target.files);
+    const allowedExts = [".nii", ".nii.gz", ".png", ".jpg", ".jpeg"];
+
     const allowedFiles = newFiles.filter((file) => {
-      const isNii = file.name.toLowerCase().endsWith(".nii") || file.name.toLowerCase().endsWith(".nii.gz");
-      return isNii;
+      const lowerName = file.name.toLowerCase();
+      return allowedExts.some((ext) => lowerName.endsWith(ext));
     });
+
     const allFiles = [...flairFiles, ...allowedFiles];
     const unique = Array.from(new Set(allFiles.map((f) => f.name))).map((name) =>
       allFiles.find((f) => f.name === name)
@@ -67,23 +69,33 @@ export default function Modal({ onClose, onSubmit, chats }) {
 
   const handleT1ceFileChange = (event) => {
     const newFiles = Array.from(event.target.files);
+  
+    // Allowed extensions
+    const allowedExts = [".nii", ".nii.gz", ".jpg", ".jpeg", ".png"];
+  
+    // Filter files by extension
     const allowedFiles = newFiles.filter((file) => {
-      const isNii = file.name.toLowerCase().endsWith(".nii") || file.name.toLowerCase().endsWith(".nii.gz");
-      return isNii;
+      const lowerName = file.name.toLowerCase();
+      return allowedExts.some((ext) => lowerName.endsWith(ext));
     });
+  
+    // Combine with existing files, keep unique by name
     const allFiles = [...t1ceFiles, ...allowedFiles];
     const unique = Array.from(new Set(allFiles.map((f) => f.name))).map((name) =>
       allFiles.find((f) => f.name === name)
     );
+  
     setT1ceFiles(unique);
     event.target.value = null;
   };
-
+  
   const getFileIcon = (fileName) => {
     const lower = fileName.toLowerCase();
     if (lower.endsWith(".nii") || lower.endsWith(".nii.gz")) return "🧠";
+    if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png")) return "🖼️";
     return "📁";
   };
+  
 
   const handleRemoveFlairFile = (index) => {
     setFlairFiles((prev) => prev.filter((_, i) => i !== index));
@@ -177,7 +189,7 @@ export default function Modal({ onClose, onSubmit, chats }) {
                 ref={flairFileInputRef} 
                 onChange={handleFlairFileChange} 
                 multiple 
-                accept=".nii,.nii.gz"
+                accept=".nii,.nii.gz,.png,.jpg,.jpeg"
                 style={{ display: "none" }} 
               />
               <div className="file-list">

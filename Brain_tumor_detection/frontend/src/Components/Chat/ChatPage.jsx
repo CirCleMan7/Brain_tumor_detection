@@ -5,12 +5,15 @@ import "./chat.css";
 import "./arrow.css";
 import ChatInput from "./ChatInput";
 import PapayaViewer from "./../PapayaViewer"
-import Show2DImage from "./show2DImage";
+import Show2DImage from "./Show2DImage";
 
 export default function ChatPage({ chats, setChats, showModal }) {
+
   const { id } = useParams();
   const chat = chats.find((c) => c.id === id);
-
+  
+  console.log(chat);
+  console.log(chat?.content)
   // Initialize conversation state with chat conversation if exists
   const [conversation, setConversation] = useState(chat?.conversation || []);
   const [input, setInput] = useState("");
@@ -26,7 +29,6 @@ export default function ChatPage({ chats, setChats, showModal }) {
   }, [chat?.content?.selectedDimension]) 
   
   const [abortController, setAbortController] = useState(null);
-  
   
   async function getGeminiMessage(userPrompt) {
     const controller = new AbortController();
@@ -294,6 +296,18 @@ export default function ChatPage({ chats, setChats, showModal }) {
     
   };
 
+  const [viewerKey, setViewerKey] = useState(0);
+
+  const handleCloseViewer = () => {
+    setShowImage(false);
+  };
+  
+  const handleOpenViewer = () => {
+    setViewerKey((prev) => prev + 1); // force remount
+    setShowImage(true);
+  };
+
+
   if (!chat) {
     return (
       <div style={{ padding: "20px", color: "black" }}>
@@ -309,12 +323,19 @@ export default function ChatPage({ chats, setChats, showModal }) {
       {showImage && (
         <div className="viewer-container">
           {chat?.content?.selectedDimension === "2D" ? (
-            <Show2DImage setShowImage={setShowImage} imageFiles={imageFiles} />
+            <Show2DImage setShowImage={setShowImage} 
+              imageFiles={ 
+                  chat.content.viewerImages.map((url, i) => ({
+                  url,
+                  name: `image_${i + 1}.png`
+                }))
+            } 
+            />
           ) : (
             // <div className="viewer-wrapper">
             <>
-              <PapayaViewer />
-              <div className="arrow left" onClick={() => setShowImage(false)} />
+              <PapayaViewer key={viewerKey} images={chat?.content?.viewerImages} />
+              <div className="arrow left" onClick={handleCloseViewer} image={imageFiles} />
               </>
             // </div>
           )}
@@ -324,11 +345,11 @@ export default function ChatPage({ chats, setChats, showModal }) {
       {/* Right: Chat Section */}
       <div className="chat-container">
         {/* Toggle button when image is hidden */}
-        {!showImage && (imageFiles.length > 0 || chat.content.selectedDimension == "3D") && (
+        {!showImage && (chat?.content?.viewerImages?.length > 0 || chat.content.selectedDimension == "3D") && (
           <div
             style={styles.toggleButton}
             className="arrow right"
-            onClick={() => setShowImage(true)}
+            onClick={handleOpenViewer}
           />
         )}
 

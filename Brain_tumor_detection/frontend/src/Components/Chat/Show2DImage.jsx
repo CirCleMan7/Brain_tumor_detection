@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from "react";
 
 function Show2DImage({setShowImage, imageFiles}) {
     
+    console.log("in Show2DImage : ")
+    console.log(imageFiles)
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const currentImage = imageFiles?.[currentImageIndex];
 
@@ -25,7 +27,7 @@ function Show2DImage({setShowImage, imageFiles}) {
     const styles = {
         fixedContainer: {
             position: "relative",
-            left: "100px",
+            left: "40px",
             // left: "49px",
             marginLeft: "49%",
             transform: "translateX(-50%)",

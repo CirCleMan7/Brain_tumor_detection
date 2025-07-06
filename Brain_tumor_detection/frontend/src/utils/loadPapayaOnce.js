@@ -1,37 +1,29 @@
-let papayaPromise = null;
+let papayaLoaded = false;
 
-export function loadPapayaOnce() {
-  if (papayaPromise) return papayaPromise;
+export async function loadPapayaOnce() {
+  if (papayaLoaded && window.papaya?.Container) return;
 
-  papayaPromise = new Promise(async (resolve, reject) => {
-    // Load jQuery if needed
-    if (!window.$) {
-      const jqueryScript = document.createElement("script");
-      jqueryScript.src = "https://code.jquery.com/jquery-3.6.0.min.js";
-      document.body.appendChild(jqueryScript);
-      await new Promise((res) => (jqueryScript.onload = res));
-    }
+  if (!document.querySelector('script[src*="papaya.js"]')) {
+    const papayaScript = document.createElement("script");
+    papayaScript.src = "/papaya.js";
+    document.body.appendChild(papayaScript);
+    await new Promise((resolve) => (papayaScript.onload = resolve));
+  }
 
-    // Only load CSS once
-    if (!document.querySelector("link[href='/papaya.css']")) {
-      const css = document.createElement("link");
-      css.rel = "stylesheet";
-      css.href = "/papaya.css";
-      document.head.appendChild(css);
-    }
+  if (!document.querySelector('link[href*="papaya.css"]')) {
+    const css = document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = "/papaya.css";
+    document.head.appendChild(css);
+  }
 
-    // Only load papaya.js once
-    if (!window.papaya || !window.papaya.Container) {
-      const script = document.createElement("script");
-      script.src = "/papaya.js";
-      script.async = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject("Failed to load papaya.js");
-      document.body.appendChild(script);
-    } else {
-      resolve();
-    }
-  });
+  if (!document.querySelector('script[src*="jquery"]')) {
+    const jquery = document.createElement("script");
+    jquery.src = "https://code.jquery.com/jquery-3.6.0.min.js";
+    document.head.appendChild(jquery);
+    await new Promise((resolve) => (jquery.onload = resolve));
+  }
 
-  return papayaPromise;
+  papayaLoaded = true;
+  console.log("✅ Papaya loaded");
 }

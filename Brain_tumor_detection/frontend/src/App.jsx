@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import "./App.css"
 import Introduction from "./Components/Intoduction";
 import { useNavigate } from "react-router-dom";
+import { toDataURL } from "./utils/toDataURL";
 
 export default function App() {
   const [chats, setChats] = useState([]);
@@ -45,20 +46,35 @@ export default function App() {
     // Step 3: Process backend (first submit_case, then gemini)
     try {
       const formData = new FormData();
-      Object.entries(content).forEach(([key, value]) => {
-        if (key === "files") {
-          for (const file of value) formData.append("files", file);
-        } else {
-          formData.append(key, value);
-        }
-      });
+
+      // Add string fields
+      formData.append("doctorFirstName", content.doctorFirstName ?? "");
+      formData.append("doctorLastName", content.doctorLastName ?? "");
+      formData.append("patientId", content.patientId ?? "");
+      formData.append("sampleCollectionDate", content.sampleCollectionDate ?? "");
+      formData.append("testIndication", content.testIndication ?? "");
+      formData.append("selectedDimension", content.selectedDimension ?? "");
+
+      // Add individual files
+      if (content.flairFiles[0] instanceof File) {
+        formData.append("flairFiles", content.flairFiles[0]);
+      }
+
+      if (content.t1ceFiles[0] instanceof File) {
+        formData.append("t1ceFiles", content.t1ceFiles[0]);
+      }
+
+      // if (content.other instanceof File) {
+      //   formData.append("files", content.other); // "files" = the general file field
+      // }
       
       const res = await fetch("http://localhost:8000/submit_case", {
         method: "POST",
         body: formData,
       });
-
+      
       const data = await res.json();
+
       const aiPrompt = `Analyze case for ${topic}`;
       
       // Optionally send to Gemini
@@ -71,7 +87,11 @@ export default function App() {
       const geminiData = await geminiRes.json();
       const aiReply = geminiData.reply || "❌ Failed to connect AI.";
 
+      console.log("data")
+      console.log(data)
+
       // Assume backend returns .images only for 2D, and maybe slices or imageURL for 3D
+      // Assume backend returns .images only for 2D, and maybe image_url + predicted_labels for 3D
       let conversation = [{ sender: "ai", text: "✅ Case processed successfully." }];
 
       if (is2D && data.images?.length) {
@@ -80,14 +100,29 @@ export default function App() {
 
       if (is3D) {
         conversation.push({ sender: "ai", text: "🧠 Detected 3D scan (NIfTI). Opening viewer..." });
+
+        // ✅ Include predicted tumor labels (optional)
+        if (data.predicted_labels?.length) {
+          conversation.push({
+            sender: "ai",
+            text: `🧪 Tumor Types Detected: ${data.predicted_labels.join(", ")}`,
+          });
+        }
       }
 
-      conversation.push({ sender: "ai", text: `Doctor name is ${content.doctorFirstName} ${content.doctorLastName}\nPatient name is ${content.patientFirstName} ${content.patientLastName}` });
+      conversation.push({
+        sender: "ai",
+        text: `👨‍⚕️ Doctor: ${content.doctorFirstName} ${content.doctorLastName}\n👤 Patient: ${content.patientFirstName} ${content.patientLastName}`,
+      });
+
+
       conversation.push({ sender: "ai", text: aiReply });
+      // Now include all 3 in order: FLAIR, T1CE, Segmentation
 
-      console.log("Backend returned images:", data.images);
-
-      // Step 4: Update conversation in chat
+      const viewerImages = data.image_urls;
+      // console.log("App.jsx")
+      // console.log(viewerImages3D)
+      // ✅ Update chat state with additional 3D image url (or 2D image previews)
       setChats((prevChats) =>
         prevChats.map((c) =>
           c.id === chatId
@@ -95,9 +130,11 @@ export default function App() {
                 ...c,
                 content: {
                   ...c.content,
-                  imageUrls: is2D ? data.images || [] : [], // only attach for 2D
+                  viewerImages: viewerImages,
+                  metric: is2D ? data.metric || [] : [], // 2D preview images
+                  predictedLabels: is3D ? data.predicted_labels : [],
                 },
-                conversation: conversation,
+                conversation,
               }
             : c
         )
