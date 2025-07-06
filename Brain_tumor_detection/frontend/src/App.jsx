@@ -9,6 +9,23 @@ import Introduction from "./Components/Intoduction";
 import { useNavigate } from "react-router-dom";
 import { toDataURL } from "./utils/toDataURL";
 
+const formatMetrics = (metrics) => {
+  if (!metrics) return "No metrics available.";
+
+  let metricStrings = Object.entries(metrics).map(([key, value]) => {
+    if (typeof value === 'object') {
+      const perClass = Object.entries(value).map(
+        ([label, val]) => `  - ${label}: ${JSON.stringify(val)}`
+      ).join('\n');
+      return `${key}:\n${perClass}`;
+    }
+    return `${key}: ${value}`;
+  });
+
+  return metricStrings.join('\n');
+};
+
+
 export default function App() {
   const [chats, setChats] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -75,8 +92,30 @@ export default function App() {
       
       const data = await res.json();
 
-      const aiPrompt = `Analyze case for ${topic}`;
-      
+      const info = is2D ? formatMetrics(data.metrics) : data.predicted_labels;
+
+      const aiPrompt = `
+      🧠 Brain Tumor Analysis Report
+
+      🔍 Case Details:
+      - Test Indication: ${content.testIndication}
+      - Scan Dimension: ${content.selectedDimension}
+      - Sample Collection Date: ${content.sampleCollectionDate}
+
+      👤 Patient Information:
+      - Patient ID: ${content.patientId}
+      - Name: ${content.patientFirstName} ${content.patientLastName}
+
+      👨‍⚕️ Referring Doctor:
+      - Name: Dr. ${content.doctorFirstName} ${content.doctorLastName}
+
+      📊 Model Output:
+      ${info}
+
+      📝 Based on the provided case information and model output, please offer any clinical insights, follow-up recommendations, or further tests you would advise. The more comprehensive, the better.
+      `.trim();
+
+
       // Optionally send to Gemini
       const flowiseRes = await fetch("http://localhost:8000/flowise", {
         method: "POST",
@@ -85,7 +124,7 @@ export default function App() {
       });
 
       const flowiseData = await flowiseRes.json();
-      const aiReply = flowiseData.reply || "❌ Failed to connect AI.";
+      const aiReply = flowiseData.reply?.text || "❌ Failed to connect AI.";
 
       // Assume backend returns .images only for 2D, and maybe slices or imageURL for 3D
       // Assume backend returns .images only for 2D, and maybe image_url + predicted_labels for 3D
@@ -109,9 +148,28 @@ export default function App() {
 
       conversation.push({
         sender: "ai",
-        text: `👨‍⚕️ Doctor: ${content.doctorFirstName} ${content.doctorLastName}\n👤 Patient: ${content.patientFirstName} ${content.patientLastName}`,
+        text: 
+          "## 🧠 Brain Tumor Segmentation Report\n" +
+          "### 👨‍⚕️ Doctor\n" +
+          `**${content.doctorFirstName} ${content.doctorLastName}**\n` +
+          "### 👤 Patient\n" +
+          `**${content.patientFirstName} ${content.patientLastName}**\n` +
+          `🆔 Patient ID: \`${content.patientId}\`\n` +
+          "### 📅 Sample Collection Date\n" +
+          `\`${content.sampleCollectionDate}\`\n` +
+          "### 🔬 Test Indication\n" +
+          `\`${content.testIndication}\`\n` +
+          "### 🖼️ Scan Dimension\n" +
+          `\`${content.selectedDimension}\`\n` +
+          "---\n" +
+          "### 📊 Model Output\n" +
+          `${is2D ? `\`\`\`\n${formatMetrics(data.metrics)}\n\`\`\`` : `\`\`\`\n${data.predicted_labels}\n\`\`\``}\n` +
+          "---\n" +
+          "### 💬 Next Steps\n" +
+          "Please provide any clinical insights, follow-up suggestions, or diagnostic advice based on the information above."
       });
-
+      
+      
 
       conversation.push({ sender: "ai", text: aiReply });
       // Now include all 3 in order: FLAIR, T1CE, Segmentation
@@ -176,7 +234,7 @@ export default function App() {
           setShowModal={setShowModal}
         />
 
-        <div style={{ marginLeft: "250px", padding: "20px", flex: 1 }}>
+        <div style={{ marginLeft: "250px", padding: "20px", flex: 1, }}>
           <Routes>
             <Route path="/chat/:id" element={<ChatPage chats={chats} setChats={setChats} showModal={showModal} />} />
             <Route path="/" element={<Introduction/>} />
