@@ -31,8 +31,6 @@ from unet_predict import (
     visualize_mask
 )
 
-
-
 load_dotenv()
 FLOWISE_API_URL = "https://cloud.flowiseai.com/api/v1/prediction/08f57a86-be58-494b-aed2-6640416b4a35"
 
@@ -126,42 +124,43 @@ def read_nifti_from_bytes(file_bytes):
 # ----------- Flowise API -----------
 @app.post("/flowise")
 async def ask_flowise(req: Request):
-    print("📨 Flowise request received")
-    if not FLOWISE_API_URL:
-        return {"error": "FLOWISE_API_URL is not set in environment variables"}
-    try:
-        data = await req.json()
-        prompt = data.get("prompt")
-        print("📨 Flowise prompt received:", prompt)
-        if not prompt or not prompt.strip():
-            return {"error": "No prompt provided"}
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            print("📨 Sending request to Flowise API:", FLOWISE_API_URL)
-            response = await client.post(FLOWISE_API_URL, json={"question": prompt})
-            print("📨 Flowise response status:", response.status_code)
-        try:
-            result = response.json()
-        except Exception:
-            print("❌ Failed to parse Flowise JSON")
-            return {
-                "error": "Invalid JSON from Flowise",
-                "status": response.status_code,
-                "raw_response": response.text
-            }
-        print("📨 Flowise response:", result)
-        return {"reply": result}
-    except Exception as e:
-        print("❌ Flowise exception occurred:")
-        traceback.print_exc()
-        return {
+    return {
             "error": "Internal server error",
-            "message": str(e),
+            "text": "error",
             "trace": traceback.format_exc()
-        }
-
-
-import tempfile
-import os
+    }
+    # print("📨 Flowise request received")
+    # if not FLOWISE_API_URL:
+    #     return {"error": "FLOWISE_API_URL is not set in environment variables"}
+    # try:
+    #     data = await req.json()
+    #     prompt = data.get("prompt")
+    #     print("📨 Flowise prompt received:", prompt)
+    #     if not prompt or not prompt.strip():
+    #         return {"error": "No prompt provided"}
+    #     async with httpx.AsyncClient(timeout=30.0) as client:
+    #         print("📨 Sending request to Flowise API:", FLOWISE_API_URL)
+            # response = await client.post(FLOWISE_API_URL, json={"question": prompt})
+            # print("📨 Flowise response status:", response.status_code)
+    #     try:
+    #         result = response.json()
+    #     except Exception:
+    #         print("❌ Failed to parse Flowise JSON")
+    #         return {
+    #             "error": "Invalid JSON from Flowise",
+    #             "status": response.status_code,
+    #             "raw_response": response.text
+    #         }
+    #     print("📨 Flowise response:", result)
+    #     return {"reply": result}
+    # except Exception as e:
+    #     print("❌ Flowise exception occurred:")
+    #     traceback.print_exc()
+    #     return {
+    #         "error": "Internal server error",
+    #         "message": str(e),
+    #         "trace": traceback.format_exc()
+        # }
 
 # === Main /submit_case ===
 @app.post("/submit_case")
@@ -281,24 +280,17 @@ async def submit_case(
             cv2.imwrite(input_img_path, original_img)
 
             # --- Handle optional mask upload ---
-            mask_file = None
+            mask_file = t1ceFiles[0] if t1ceFiles else None
             mask_array = None
             mask_input_url = None
             # You can add maskFiles: Optional[List[UploadFile]] = File(None) in your endpoint params
             # Here is an example assuming you get mask file as separate UploadFile (adjust accordingly)
 
-            # For example, if you add maskFiles param to your endpoint:
-            # mask_file = maskFiles[0] if maskFiles else None
-
-            # Or if mask is submitted alongside flairFiles (adjust to your form)
-            # For demo, let's assume mask_file is received somehow:
-            # mask_file = maskFiles[0] if maskFiles else None
-
             if mask_file:
                 try:
                     mask_bytes = await mask_file.read()
                     mask_filename = mask_file.filename.lower()
-
+                    print("mask file processing")
                     if mask_filename.endswith(".npy"):
                         mask_array = np.load(io.BytesIO(mask_bytes), allow_pickle=True)
                         mask_array_vis = ((mask_array - mask_array.min()) / (mask_array.max() - mask_array.min() + 1e-8) * 255).astype(np.uint8)
@@ -316,6 +308,8 @@ async def submit_case(
 
             # Evaluate if mask is provided
             metrics = evaluate_array(pred_mask=pred, true_mask=mask_array) if mask_array is not None else None
+
+            print("this is metrics data", metrics)
 
             base_url = "http://localhost:8000/files"
             return {
