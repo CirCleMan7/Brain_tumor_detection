@@ -12,8 +12,6 @@ export default function ChatPage({ chats, setChats, showModal }) {
   const { id } = useParams();
   const chat = chats.find((c) => c.id === id);
   
-  console.log(chat);
-  console.log(chat?.content)
   // Initialize conversation state with chat conversation if exists
   const [conversation, setConversation] = useState(chat?.conversation || []);
   const [input, setInput] = useState("");
@@ -30,21 +28,25 @@ export default function ChatPage({ chats, setChats, showModal }) {
   
   const [abortController, setAbortController] = useState(null);
   
-  async function getGeminiMessage(userPrompt) {
+  async function getFlowiseMessage(userPrompt) {
     const controller = new AbortController();
     setAbortController(controller);
     
+    console.log("Conversation");
+    console.log(chat)
+
     try {
       const res = await fetch("http://localhost:8000/flowise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: aiPrompt }),
+        body: JSON.stringify({ prompt: userPrompt }),
+        signal: abortController?.signal,
       });
       
       if (!res.ok) throw new Error("Server error");
       
       const data = await res.json();
-      return data.reply || "No response from Gemini";
+      return data?.reply || "No response from Gemini";
     } catch (error) {
       if (error.name === "AbortError") {
         // ✅ Handle cancellation gracefully
@@ -79,18 +81,18 @@ export default function ChatPage({ chats, setChats, showModal }) {
     setInput("");
     
     // Get AI response
-    const aiResponse = await getGeminiMessage(trimmed);
+    const aiResponse = await getFlowiseMessage(trimmed);
     
     // Replace typing with actual AI response
     const updatedMessages = [
       ...newMessages.slice(0, -1),
-      { sender: "ai", text: aiResponse },
+      { sender: "ai", text: aiResponse.text },
     ];
     setConversation(updatedMessages);
     
     // Update global chats state with new conversation
     setChats((prevChats) =>
-    prevChats.map((c) =>
+    prevChats?.map((c) =>
     c.id === chat.id ? { ...c, conversation: updatedMessages } : c
     )
     );
@@ -239,6 +241,11 @@ export default function ChatPage({ chats, setChats, showModal }) {
 
   // ==============================================================================
   // for make a scroll page only 2D 
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [conversation]);
 
   const imageFiles = [
   // AI generated images (usually base64 or URLs)
@@ -324,7 +331,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
           {chat?.content?.selectedDimension === "2D" ? (
             <Show2DImage setShowImage={setShowImage} 
               imageFiles={ 
-                  chat.content.viewerImages.map((url, i) => ({
+                  chat?.content?.viewerImages?.map((url, i) => ({
                   url,
                   name: `image_${i + 1}.png`
                 }))
@@ -368,6 +375,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
               </div>
             </div>
           ))}
+          <div ref={bottomRef} />
         </div>
 
         <ChatInput
