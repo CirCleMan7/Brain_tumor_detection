@@ -1,6 +1,6 @@
 /* Base Container for the Chat Input - Minimalist */
 .chat-input-container {
-  position: fixed;
+  position: relative;
   bottom: 0; /* Align to the very bottom */
   left: 0;
   right: 0;
@@ -26,6 +26,7 @@
   border-radius: 30px; /* Highly rounded corners for the pill shape */
   border: 1px solid #e0e0e0; /* Very light border */
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); /* Soft, subtle shadow */
+  margin-bottom: 50px;
   padding: 8px 12px; /* Padding inside the pill, around the text and button */
 }
 

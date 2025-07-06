@@ -187,8 +187,8 @@ export default function PapayaViewer({ images = [] }) {
       {(!papayaShellStarted || (images.length > 0 && !imagesLoadedIntoViewer)) && (
         <div
           style={{
-            width: 600,
-            height: 600,
+            width: "600px",
+            height: "600px",
             background: "#f0f0f0",
             border: "1px solid #ccc",
             borderRadius: "10px",

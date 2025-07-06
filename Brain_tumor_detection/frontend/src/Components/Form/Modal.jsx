@@ -53,7 +53,7 @@ export default function Modal({ onClose, onSubmit, chats }) {
 
   const handleFlairFileChange = (event) => {
     const newFiles = Array.from(event.target.files);
-    const allowedExts = [".nii", ".nii.gz", ".png", ".jpg", ".jpeg"];
+    const allowedExts = [".nii", ".nii.gz", ".npy",  ".png", ".jpg", ".jpeg"];
 
     const allowedFiles = newFiles.filter((file) => {
       const lowerName = file.name.toLowerCase();
@@ -80,7 +80,7 @@ export default function Modal({ onClose, onSubmit, chats }) {
     const newFiles = Array.from(event.target.files);
   
     // Allowed extensions
-    const allowedExts = [".nii", ".nii.gz", ".jpg", ".jpeg", ".png"];
+    const allowedExts = [".nii", ".nii.gz", ".npy", ".jpg", ".jpeg", ".png"];
   
     // Filter files by extension
     const allowedFiles = newFiles.filter((file) => {
@@ -101,6 +101,7 @@ export default function Modal({ onClose, onSubmit, chats }) {
   const getFileIcon = (fileName) => {
     const lower = fileName.toLowerCase();
     if (lower.endsWith(".nii") || lower.endsWith(".nii.gz")) return "🧠";
+    if (lower.endsWith(".npy")) return "🗃️";  // icon for numpy array file
     if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png")) return "🖼️";
     return "📁";
   };

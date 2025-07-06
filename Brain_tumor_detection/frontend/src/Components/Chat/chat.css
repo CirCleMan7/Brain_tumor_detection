@@ -1,4 +1,3 @@
-
 .chat-page {
   position: relative;
   display: flex;
@@ -91,24 +90,37 @@
 }
 
 .sender-name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  color: #999;
-  margin-bottom: 4px;
+  color: #6b7280;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
 }
 
-/* Bubbles */
+/* Enhanced Bubbles */
 .bubble {
-  background-color: #f0f0f0;
-  padding: 10px 14px;
-  border-radius: 14px;
+  background-color: #f8fafc;
+  padding: 14px 18px;
+  border-radius: 18px;
   word-wrap: break-word;
   white-space: pre-wrap;
   overflow-wrap: break-word;
-  max-width: 100%;         /* ✅ prevent overflow */
+  max-width: 100%;
   width: fit-content;
   box-sizing: border-box;
   animation: fadeIn 0.8s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  line-height: 1.6;
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.bubble:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
 }
 
 @keyframes fadeIn {
@@ -121,13 +133,92 @@
 }
 
 .message.user .bubble {
-  background-color: #d0ebff;
-  color: #00252a;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  border: none;
+  font-weight: 500;
+}
+
+.message.user .bubble:hover {
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
 .message.ai .bubble {
-  background-color: #e9ecef;
-  color: #212529;
+  background-color: #ffffff;
+  color: #1f2937;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.message.ai .bubble:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced typography within bubbles */
+.bubble p {
+  margin: 0 0 8px 0;
+  line-height: 1.6;
+}
+
+.bubble p:last-child {
+  margin-bottom: 0;
+}
+
+.bubble h1, .bubble h2, .bubble h3, .bubble h4, .bubble h5, .bubble h6 {
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  color: inherit;
+}
+
+.bubble ul, .bubble ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.bubble li {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.bubble code {
+  background-color: rgba(0, 0, 0, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.message.user .bubble code {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.bubble pre {
+  background-color: #f3f4f6;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 8px 0;
+  border: 1px solid #e5e7eb;
+}
+
+.message.user .bubble pre {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.bubble blockquote {
+  border-left: 3px solid #d1d5db;
+  padding-left: 16px;
+  margin: 8px 0;
+  font-style: italic;
+  color: #6b7280;
+}
+
+.message.user .bubble blockquote {
+  border-left-color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* Avatar */
