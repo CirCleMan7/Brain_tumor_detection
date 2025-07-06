@@ -35,11 +35,10 @@ export default function ChatPage({ chats, setChats, showModal }) {
     setAbortController(controller);
     
     try {
-      const res = await fetch("http://localhost:8000/gemini", {
+      const res = await fetch("http://localhost:8000/flowise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: userPrompt }),
-        signal: controller.signal,
+        body: JSON.stringify({ prompt: aiPrompt }),
       });
       
       if (!res.ok) throw new Error("Server error");

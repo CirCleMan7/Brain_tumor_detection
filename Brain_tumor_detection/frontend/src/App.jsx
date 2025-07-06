@@ -78,17 +78,14 @@ export default function App() {
       const aiPrompt = `Analyze case for ${topic}`;
       
       // Optionally send to Gemini
-      const geminiRes = await fetch("http://localhost:8000/gemini", {
+      const flowiseRes = await fetch("http://localhost:8000/flowise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: aiPrompt }),
       });
 
-      const geminiData = await geminiRes.json();
-      const aiReply = geminiData.reply || "❌ Failed to connect AI.";
-
-      console.log("data")
-      console.log(data)
+      const flowiseData = await flowiseRes.json();
+      const aiReply = flowiseData.reply || "❌ Failed to connect AI.";
 
       // Assume backend returns .images only for 2D, and maybe slices or imageURL for 3D
       // Assume backend returns .images only for 2D, and maybe image_url + predicted_labels for 3D

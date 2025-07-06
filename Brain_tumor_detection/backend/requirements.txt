@@ -1,8 +1,11 @@
 fastapi
 uvicorn
-httpx
-python-dotenv
-nibabel
-pillow
-python-multipart
+starlette
 numpy
+opencv-python
+tensorflow
+python-dotenv
+httpx
+pillow
+nibabel
+pdf2image

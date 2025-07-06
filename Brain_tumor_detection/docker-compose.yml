@@ -1,4 +1,3 @@
-# version: "3.9"
 services:
   backend:
     build:
@@ -8,8 +7,8 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
-    environment:
-      - GEMINI_API_KEY=your_api_key_here
+    env_file:
+      - .env
 
   frontend:
     build:
@@ -21,3 +20,13 @@ services:
       - ./frontend:/app
     depends_on:
       - backend
+
+  flowise:
+    image: flowiseai/flowise:latest
+    restart: always
+    ports:
+      - "3100:3000"
+    environment:
+      - PORT=3000
+    volumes:
+      - ./flowise-data:/root/.flowise

@@ -34,7 +34,7 @@ from unet_predict import (
 
 
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+FLOWISE_API_URL = "https://cloud.flowiseai.com/api/v1/prediction/08f57a86-be58-494b-aed2-6640416b4a35"
 
 app = FastAPI()
 app.mount("/files", StaticFiles(directory="static/files"), name="files")
@@ -123,71 +123,42 @@ def read_nifti_from_bytes(file_bytes):
 
 # ========================================================================================================================
 
-@app.post("/gemini")
-async def ask_gemini(req: Request):
-    return {"error": "No prompt"}
-    # try:
-    #     data = await req.json()
-    #     prompt = data.get("prompt")
-    #     print("📨 Prompt received:", prompt)
+# ----------- Flowise API -----------
+@app.post("/flowise")
+async def ask_flowise(req: Request):
+    print("📨 Flowise request received")
+    if not FLOWISE_API_URL:
+        return {"error": "FLOWISE_API_URL is not set in environment variables"}
+    try:
+        data = await req.json()
+        prompt = data.get("prompt")
+        print("📨 Flowise prompt received:", prompt)
+        if not prompt or not prompt.strip():
+            return {"error": "No prompt provided"}
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            print("📨 Sending request to Flowise API:", FLOWISE_API_URL)
+            response = await client.post(FLOWISE_API_URL, json={"question": prompt})
+            print("📨 Flowise response status:", response.status_code)
+        try:
+            result = response.json()
+        except Exception:
+            print("❌ Failed to parse Flowise JSON")
+            return {
+                "error": "Invalid JSON from Flowise",
+                "status": response.status_code,
+                "raw_response": response.text
+            }
+        print("📨 Flowise response:", result)
+        return {"reply": result}
+    except Exception as e:
+        print("❌ Flowise exception occurred:")
+        traceback.print_exc()
+        return {
+            "error": "Internal server error",
+            "message": str(e),
+            "trace": traceback.format_exc()
+        }
 
-    #     if not prompt or not prompt.strip():
-    #         return {"error": "No prompt provided"}
-
-    #     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
-    #     headers = {"Content-Type": "application/json"}
-    #     payload = {
-    #         "contents": [{"parts": [{"text": prompt}]}]
-    #     }
-
-    #     print("📦 Sending to Gemini:", payload)
-
-    #     async with httpx.AsyncClient(timeout=30.0) as client:
-    #         res = await client.post(url, headers=headers, json=payload)
-    #         print("📬 Gemini status:", res.status_code)
-    #         print("📨 Raw response text:", res.text)
-
-    #         try:
-    #             res_json = res.json()
-    #         except Exception:
-    #             print("❌ Failed to parse JSON from Gemini")
-    #             traceback.print_exc()
-    #             return {
-    #                 "error": "Invalid JSON from Gemini",
-    #                 "status": res.status_code,
-    #                 "raw_response": res.text
-    #             }
-
-    #     try:
-    #         candidates = res_json.get("candidates", [])
-    #         if not candidates:
-    #             raise ValueError("Missing 'candidates'")
-
-    #         content = candidates[0].get("content", {})
-    #         parts = content.get("parts", [])
-    #         if not parts or "text" not in parts[0]:
-    #             raise ValueError("Missing 'text' in parts")
-
-    #         reply = parts[0]["text"]
-    #         return {"reply": reply}
-
-    #     except Exception:
-    #         print("❌ Unexpected Gemini response structure")
-    #         traceback.print_exc()
-    #         return {
-    #             "error": "Unexpected Gemini response format",
-    #             "data": res_json
-    #         }
-
-    # except Exception as e:
-    #     print("❌ Outer exception occurred:")
-    #     traceback.print_exc()
-    #     return {
-    #         "error": "Internal server error",
-    #         "message": str(e),
-    #         "trace": traceback.format_exc()
-    #     }
-    
 
 import tempfile
 import os
