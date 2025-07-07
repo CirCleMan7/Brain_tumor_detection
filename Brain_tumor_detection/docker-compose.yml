@@ -16,17 +16,15 @@ services:
       dockerfile: Dockerfile.frontend
     ports:
       - "3000:3000"
-    volumes:
-      - ./frontend:/app
     depends_on:
       - backend
 
-  flowise:
-    image: flowiseai/flowise:latest
-    restart: always
-    ports:
-      - "3100:3000"
-    environment:
-      - PORT=3000
-    volumes:
-      - ./flowise-data:/root/.flowise
+  # flowise:
+  #   image: flowiseai/flowise:latest
+  #   restart: always
+  #   ports:
+  #     - "3100:3000"
+  #   environment:
+  #     - PORT=3000
+  #   volumes:
+  #     - ./flowise-data:/root/.flowise
