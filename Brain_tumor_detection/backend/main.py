@@ -124,43 +124,39 @@ def read_nifti_from_bytes(file_bytes):
 # ----------- Flowise API -----------
 @app.post("/flowise")
 async def ask_flowise(req: Request):
-    return {
+    # return {"error": "FLOWISE_API_URL is not set in environment variables"}
+    print("📨 Flowise request received")
+    if not FLOWISE_API_URL:
+        return {"error": "FLOWISE_API_URL is not set in environment variables"}
+    try:
+        data = await req.json()
+        prompt = data.get("prompt")
+        print("📨 Flowise prompt received:", prompt)
+        if not prompt or not prompt.strip():
+            return {"error": "No prompt provided"}
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            print("📨 Sending request to Flowise API:", FLOWISE_API_URL)
+            response = await client.post(FLOWISE_API_URL, json={"question": prompt})
+            print("📨 Flowise response status:", response.status_code)
+        try:
+            result = response.json()
+        except Exception:
+            print("❌ Failed to parse Flowise JSON")
+            return {
+                "error": "Invalid JSON from Flowise",
+                "status": response.status_code,
+                "raw_response": response.text
+            }
+        print("📨 Flowise response:", result)
+        return {"reply": result}
+    except Exception as e:
+        print("❌ Flowise exception occurred:")
+        traceback.print_exc()
+        return {
             "error": "Internal server error",
-            "text": "error",
+            "message": str(e),
             "trace": traceback.format_exc()
-    }
-    # print("📨 Flowise request received")
-    # if not FLOWISE_API_URL:
-    #     return {"error": "FLOWISE_API_URL is not set in environment variables"}
-    # try:
-    #     data = await req.json()
-    #     prompt = data.get("prompt")
-    #     print("📨 Flowise prompt received:", prompt)
-    #     if not prompt or not prompt.strip():
-    #         return {"error": "No prompt provided"}
-    #     async with httpx.AsyncClient(timeout=30.0) as client:
-    #         print("📨 Sending request to Flowise API:", FLOWISE_API_URL)
-            # response = await client.post(FLOWISE_API_URL, json={"question": prompt})
-            # print("📨 Flowise response status:", response.status_code)
-    #     try:
-    #         result = response.json()
-    #     except Exception:
-    #         print("❌ Failed to parse Flowise JSON")
-    #         return {
-    #             "error": "Invalid JSON from Flowise",
-    #             "status": response.status_code,
-    #             "raw_response": response.text
-    #         }
-    #     print("📨 Flowise response:", result)
-    #     return {"reply": result}
-    # except Exception as e:
-    #     print("❌ Flowise exception occurred:")
-    #     traceback.print_exc()
-    #     return {
-    #         "error": "Internal server error",
-    #         "message": str(e),
-    #         "trace": traceback.format_exc()
-        # }
+        }
 
 # === Main /submit_case ===
 @app.post("/submit_case")
@@ -234,13 +230,15 @@ async def submit_case(
             }
 
         elif selectedDimension == "2D":
+            
             flair_file = flairFiles[0] if flairFiles else None
             if not flair_file:
                 raise HTTPException(status_code=400, detail="Missing 2D image file")
 
             # Save uploaded image
+            case_id = str(uuid.uuid4())
             filename = f"2d_input_{uuid.uuid4().hex}_{flair_file.filename}"
-            save_dir = "static/files"
+            save_dir = "static/files/2D_image"
             os.makedirs(save_dir, exist_ok=True)
             filepath = os.path.join(save_dir, filename)
 
@@ -271,9 +269,9 @@ async def submit_case(
             mask_vis = visualize_mask(pred)
 
             # Save output images
-            out_mask = os.path.join(save_dir, "output_mask.png")
-            out_overlay = os.path.join(save_dir, "overlay.png")
-            input_img_path = os.path.join(save_dir, "input_image.png")
+            out_mask = os.path.join(save_dir, f"{case_id}_output_mask.png")
+            out_overlay = os.path.join(save_dir, f"{case_id}_overlay.png")
+            input_img_path = os.path.join(save_dir, f"{case_id}_input_image.png")
 
             cv2.imwrite(out_mask, mask_vis)
             cv2.imwrite(out_overlay, overlay)
@@ -311,13 +309,13 @@ async def submit_case(
 
             print("this is metrics data", metrics)
 
-            base_url = "http://localhost:8000/files"
+            base_url = "http://localhost:8000/files/2D_image"
             return {
                 "reply": "✅ 2D brain segmentation complete.",
                 "image_urls": [
-                    f"{base_url}/input_image.png",
-                    f"{base_url}/output_mask.png",
-                    f"{base_url}/overlay.png",
+                    f"{base_url}/{case_id}_input_image.png",
+                    f"{base_url}/{case_id}_output_mask.png",
+                    f"{base_url}/{case_id}_overlay.png",
                 ],
                 "original_mask_url": mask_input_url,
                 "metrics": metrics,

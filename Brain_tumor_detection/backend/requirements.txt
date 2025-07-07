@@ -9,3 +9,4 @@ httpx
 pillow
 nibabel
 pdf2image
+python-multipart
