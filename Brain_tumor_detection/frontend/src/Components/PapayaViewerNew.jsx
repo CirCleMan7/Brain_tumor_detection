@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 export default function PapayaViewer({ images }) {
   useEffect(() => {
-    if (!images || images.length === 0 || !window.papaya) return;
+    if (!images || images?.length === 0 || !window.papaya) return;
 
     const params = {
       images, // Just pass the array of image URLs

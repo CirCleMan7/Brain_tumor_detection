@@ -100,7 +100,7 @@ export default function PapayaViewer({ images = [] }) {
   // --- Effect 2: Load/Update Images using resetViewer ---
   useEffect(() => {
     // Only proceed if the Papaya shell is ready AND images are provided
-    if (papayaShellStarted && images && images.length > 0) {
+    if (papayaShellStarted && images && images?.length > 0) {
       // Check if images are actually different to prevent unnecessary resets
       if (JSON.stringify(images) === JSON.stringify(lastImagesRef.current)) {
         console.log("Images are the same, skipping resetViewer.");
@@ -150,7 +150,7 @@ export default function PapayaViewer({ images = [] }) {
             // Alternatively, if it's definitely the first viewer:
             // const viewer = window.papaya?.Container?.viewer?.[0];
 
-            if (viewer && viewer.isReady && viewer.imageData && viewer.imageData.images.length > 0) {
+            if (viewer && viewer.isReady && viewer.imageData && viewer.imageData.images?.length > 0) {
                 console.log("✅ Papaya viewer reports images loaded and is ready.");
                 clearInterval(imageLoadCheckInterval);
                 setImagesLoadedIntoViewer(true);
@@ -176,7 +176,7 @@ export default function PapayaViewer({ images = [] }) {
         console.error("Error setting images in Papaya viewer:", error);
         setImagesLoadedIntoViewer(false);
       }
-    } else if (papayaShellStarted && (!images || images.length === 0)) {
+    } else if (papayaShellStarted && (!images || images?.length === 0)) {
         setImagesLoadedIntoViewer(true);
     }
   }, [papayaShellStarted, images]);
@@ -184,7 +184,7 @@ export default function PapayaViewer({ images = [] }) {
   return (
     <div>
       {/* Show loading spinner if shell hasn't started OR if images are provided but not yet loaded into viewer */}
-      {(!papayaShellStarted || (images.length > 0 && !imagesLoadedIntoViewer)) && (
+      {(!papayaShellStarted || (images?.length > 0 && !imagesLoadedIntoViewer)) && (
         <div
           style={{
             width: "600px",
@@ -210,7 +210,7 @@ export default function PapayaViewer({ images = [] }) {
           className="papaya"
           id={PAPAYA_DIV_ID} // --- MODIFICATION HERE: Assign the ID to the div ---
           style={{
-            visibility: (papayaShellStarted && (!images.length || imagesLoadedIntoViewer)) ? "visible" : "hidden",
+            visibility: (papayaShellStarted && (!images?.length || imagesLoadedIntoViewer)) ? "visible" : "hidden",
             width: "100%",
             height: "600px", // Crucial for Papaya to render
           }}

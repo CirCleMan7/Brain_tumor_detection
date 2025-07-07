@@ -20,6 +20,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
   // Update conversation whenever chat changes (like switching chats)
   useEffect(() => {
     setConversation(chat?.conversation || []);
+    setShowImage(false);
   }, [chat]);
 
   useEffect(() => {
@@ -329,19 +330,21 @@ export default function ChatPage({ chats, setChats, showModal }) {
       {showImage && (
         <div className="viewer-container">
           {chat?.content?.selectedDimension === "2D" ? (
-            <Show2DImage setShowImage={setShowImage} 
-              imageFiles={ 
-                  chat?.content?.viewerImages?.map((url, i) => ({
-                  url,
-                  name: `image_${i + 1}.png`
-                }))
-            } 
+            <Show2DImage key={chat.id} setShowImage={setShowImage} 
+              imageFiles={
+                Array.isArray(chat?.content?.viewerImages)
+                  ? chat.content.viewerImages.map((url, i) => ({
+                      url,
+                      name: `image_${i + 1}.png`,
+                    }))
+                  : []
+              }
             />
           ) : (
             // <div className="viewer-wrapper">
             <>
               <PapayaViewer key={viewerKey} images={chat?.content?.viewerImages} />
-              <div className="arrow left" onClick={handleCloseViewer} image={imageFiles} />
+              <div className="arrow left" onClick={handleCloseViewer} />
               </>
             // </div>
           )}
@@ -384,7 +387,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
           handleSend={handleSend}
           isTyping={isTyping}
           cancelTyping={cancelTyping}
-          disabled={conversation.length <= 1}
+          disabled={conversation?.length <= 1}
           chat={chat}
         />
       </div>

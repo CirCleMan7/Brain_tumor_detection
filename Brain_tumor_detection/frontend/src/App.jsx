@@ -175,8 +175,6 @@ export default function App() {
       // Now include all 3 in order: FLAIR, T1CE, Segmentation
 
       const viewerImages = data.image_urls;
-      // console.log("App.jsx")
-      // console.log(viewerImages3D)
       // ✅ Update chat state with additional 3D image url (or 2D image previews)
       setChats((prevChats) =>
         prevChats.map((c) =>
