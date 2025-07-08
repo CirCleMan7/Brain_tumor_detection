@@ -142,3 +142,21 @@ def visualize_mask(mask):
     for cls, color in color_map.items():
         vis[mask == cls] = color
     return vis
+
+def get_detected_tumor_types(pred_mask):
+    tumor_class_names = {
+        1 : "Necrosis",
+        2 : "Edema",
+        3 : "Enhancing Tumor"
+    }
+
+    detected_classes = np.unique(pred_mask)
+    found = [tumor_class_names[cls] for cls in detected_classes if cls in tumor_class_names]
+
+    if not found:
+        return "not a tumor in this image"
+    elif len(found) == 1:
+        return f'found {found[0]}'
+    else:
+        return "found " + ", ".join(found)
+    
