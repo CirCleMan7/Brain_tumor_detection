@@ -5,7 +5,12 @@ import "./chat.css";
 import "./arrow.css";
 import ChatInput from "./ChatInput";
 import PapayaViewer from "./../PapayaViewer"
+import PapayaViewerNew from "./../PapayaViewerNew"
 import Show2DImage from "./Show2DImage";
+import { loadPapayaOnce } from "./../../utils/loadPapayaOnce";
+
+// eslint-disable-next-line no-undef
+const papaya = window.papaya;
 
 export default function ChatPage({ chats, setChats, showModal }) {
 
@@ -131,6 +136,10 @@ export default function ChatPage({ chats, setChats, showModal }) {
     chatLog.addEventListener("scroll", handleScroll);
     return () => chatLog.removeEventListener("scroll", handleScroll);
   }, [conversation]);
+
+
+  // const [papayaReady, setPapayaReady] = useState(false);
+
   
   // useEffect(() => {
   // if (!showScrollButton && bottomRef.current) {
@@ -228,18 +237,49 @@ export default function ChatPage({ chats, setChats, showModal }) {
       
   //     // Clean up on unmount
   //     return () => {
-  //       if (
-  //           window.papaya?.Container?.viewer?.length > 0
-  //         ) {
-  //           window.papaya.Container.resetViewer(0, true);
-  //         }
-  //       };
-  //     }, []);
-    
-  // ==============================================================================
-  
-  
+    //       if (
+      //           window.papaya?.Container?.viewer?.length > 0
+      //         ) {
+        //           window.papaya.Container.resetViewer(0, true);
+        //         }
+        //       };
+        //     }, []);
+        
+        // ==============================================================================
 
+  const [viewerParams, setViewerParams] = useState(null);
+
+  const loadExampleImages = () => {
+    console.log("check")
+    console.log(chat.content.viewerImages[0])
+    console.log(chat.content.viewerImages[1])
+    console.log(chat.content.viewerImages[2])
+    setViewerParams({
+      images: [
+        chat.content.viewerImages[0],  // base image
+        chat.content.viewerImages[1],  // overlay image
+      ],
+      kioskMode: false,
+      showControlBar: true,
+      smoothDisplay: false,
+      // กำหนดพารามิเตอร์ overlay ตามชื่อไฟล์
+      [chat.content.viewerImages[1]]: {
+        lut: "Red Overlay",
+        alpha: 0.5,
+        min: 0,
+        max: 3,
+      },
+    });
+  };
+  
+  const imageFiles3D = chat?.content?.viewerImages?.map((path, i) => ({
+    image: path,
+    name: `image_${i + 1}`,
+  })) || [];
+  
+  const papayaDivRef = useRef(null);
+  const [papayaReady, setPapayaReady] = useState(false);
+  
   // ==============================================================================
   // for make a scroll page only 2D 
   useEffect(() => {
@@ -247,24 +287,6 @@ export default function ChatPage({ chats, setChats, showModal }) {
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [conversation]);
-
-  const imageFiles = [
-  // AI generated images (usually base64 or URLs)
-  ...(chat?.content?.imageUrls?.map((url, i) => ({
-    url,
-    name: `AI_generated_${i + 1}.png`,
-    type: "image/ai",
-  })) || []),
-  
-  // Uploaded images (png, jpg, jpeg)
-  ...(chat?.content?.files
-    ?.filter(f => f.url && /\.(png|jpe?g)$/i.test(f.name))
-    ?.map(f => ({
-      url: f.url,
-      name: f.name,
-      type: f.type || "image/unknown",
-    })) || []),
-  ];
 
   const styles = {
     image: {
@@ -305,6 +327,28 @@ export default function ChatPage({ chats, setChats, showModal }) {
 
   const [viewerKey, setViewerKey] = useState(0);
 
+  const handlePredict = async () => {
+    // หลังจากส่ง request ไป backend แล้วได้ blob + file
+    // console.log(chat)
+    const baseImageDataURL = chat.content.viewerImages[0];
+    const segDataURL = chat.content.viewerImages[2];
+
+    const params = {
+      images: [baseImageDataURL, segDataURL],
+      kioskMode: false,
+      showControlBar: true,
+      smoothDisplay: false,
+    };
+    params[segDataURL] = {
+      lut: "Red Overlay",
+      alpha: 0.5,
+      min: 0,
+      max: 3,
+    };
+
+    setViewerParams(params); // <<< trigger ให้ Papaya render
+  };
+
   const handleCloseViewer = () => {
     setShowImage(false);
   };
@@ -326,11 +370,14 @@ export default function ChatPage({ chats, setChats, showModal }) {
 
   return (
     <div className={`chat-page ${showImage ? "row-layout" : ""}`}>
+  
       {/* Left: Viewer */}
       {showImage && (
-        <div className="viewer-container">
+        <div className="viewer-container" style={{ width: 800 /* fix width for viewer */ }}>
           {chat?.content?.selectedDimension === "2D" ? (
-            <Show2DImage key={chat.id} setShowImage={setShowImage} 
+            <Show2DImage
+              key={chat.id}
+              setShowImage={setShowImage}
               imageFiles={
                 Array.isArray(chat?.content?.viewerImages)
                   ? chat.content.viewerImages.map((url, i) => ({
@@ -341,27 +388,30 @@ export default function ChatPage({ chats, setChats, showModal }) {
               }
             />
           ) : (
-            // <div className="viewer-wrapper">
             <>
-              <PapayaViewer key={viewerKey} images={chat?.content?.viewerImages} />
-              <div className="arrow left" onClick={handleCloseViewer} />
-              </>
-            // </div>
+              <div>
+                <h1>Brain Tumor Segmentation</h1>
+                <button onClick={loadExampleImages}>Predict & Show</button>
+                <PapayaViewerNew viewerParams={viewerParams} />
+              </div>
+              <div onClick={handleCloseViewer}>
+                <div className="arrow left" />
+              </div>
+            </>
           )}
         </div>
       )}
-
+  
       {/* Right: Chat Section */}
-      <div className="chat-container">
-        {/* Toggle button when image is hidden */}
-        {!showImage && (chat?.content?.viewerImages?.length > 0 || chat.content.selectedDimension == "3D") && (
+      <div className="chat-container" style={{ flexGrow: 1, marginLeft: 20 }}>
+        {!showImage && (chat?.content?.viewerImages?.length > 0 || chat.content.selectedDimension === "3D") && (
           <div
             style={styles.toggleButton}
             className="arrow right"
             onClick={handleOpenViewer}
           />
         )}
-
+  
         <div key={chat.id} className="chat-log" ref={chatLogRef}>
           {conversation.map((msg, index) => (
             <div key={index} className={`message ${msg.sender}`}>
@@ -381,6 +431,8 @@ export default function ChatPage({ chats, setChats, showModal }) {
           <div ref={bottomRef} />
         </div>
 
+        {/* <div className="papaya"></div> */}
+  
         <ChatInput
           input={input}
           setInput={setInput}
@@ -392,5 +444,5 @@ export default function ChatPage({ chats, setChats, showModal }) {
         />
       </div>
     </div>
-  )
+  );  
 }

@@ -76,7 +76,13 @@ export default function PapayaViewer({ images = [] }) {
             // This tells Papaya exactly which HTML element to initialize its viewer in.
             // If you don't pass an ID, it just picks the first '.papaya' div,
             // but then it's harder to retrieve that specific viewer instance later.
-            papaya.Container.startPapaya(PAPAYA_DIV_ID); 
+            if (papaya?.Container) {
+              papaya.Container.startPapaya(PAPAYA_DIV_ID); // ✅ correct
+              console.log("✅ Papaya viewer started on:", PAPAYA_DIV_ID);
+            } else {
+              console.error("❌ Papaya.Container not found");
+            }
+            
             // --------------------------------------------------------
 
             setPapayaShellStarted(true); // Mark shell as started
@@ -127,49 +133,53 @@ export default function PapayaViewer({ images = [] }) {
         overlayOpacity: 0.5,
       };
 
+      console.log("this i papaya Container")
+      console.log(window.papaya?.Container);
+      const containerEl = document.getElementById("papaya-viewer-main");
+
+      // Dig into internal Papaya stuff (may be version-dependent)
+      const viewer = containerEl?.__viewer || containerEl?.__papaya?.viewer;
+
+      console.log("Viewer?", viewer);
+      console.log("containerEl : ", containerEl)
+
       try {
+        const viewer = papaya.Container.getViewer("papaya-viewer-main");
+        setTimeout(() => {
+          console.log("Waited 3 second!");
+        }, 3000); // 1000 milliseconds = 1 second
         // --- MODIFICATION HERE: Ensure resetViewer uses viewer index or ID ---
         // Assuming this is your first (and only) viewer, index 0 is typically correct.
         // If you were getting a viewer by ID, you might need to adjust this,
         // but `resetViewer(0, params)` works on the viewer at index 0.
+        
+        console.log("Heyyy can you hit this line")
+        if (viewer && viewer.isReady) {
+          console.log("✅ Im gonna reset View so it this show it mean you can reset.");
+        }
         papaya.Container.resetViewer(0, viewerParams); 
         // ------------------------------------------------------------------
 
         console.log("papaya.Container.resetViewer() called with new images.");
         lastImagesRef.current = images; // Update the ref with the new images
-
-        // --- MODIFICATION HERE: Improved Viewer Instance Check ---
-        // The previous "viewer undefined" likely came from trying to get
-        // the instance at the wrong time or using a method inconsistent
-        // with how it was started.
-        // Now that `startPapaya(PAPAYA_DIV_ID)` is used, we can reliably
-        // get the viewer by its ID, or by index 0 if it's the first one.
-        let imageLoadCheckInterval = setInterval(() => {
-            // Get the viewer instance for the specific ID we used
-            const viewer = window.papaya?.Container?.getViewer(PAPAYA_DIV_ID);
-            // Alternatively, if it's definitely the first viewer:
-            // const viewer = window.papaya?.Container?.viewer?.[0];
-
-            if (viewer && viewer.isReady && viewer.imageData && viewer.imageData.images?.length > 0) {
-                console.log("✅ Papaya viewer reports images loaded and is ready.");
-                clearInterval(imageLoadCheckInterval);
-                setImagesLoadedIntoViewer(true);
-            } else {
-                // This might indicate the viewer isn't ready or images haven't propagated yet
-                console.log("Papaya viewer not yet ready or no images loaded internally. Retrying check...");
-            }
-        }, 300);
-
-        let imageLoadTimeout = setTimeout(() => {
-            if (!imagesLoadedIntoViewer) {
-                console.warn("⏱️ Papaya image loading timed out (30s) after resetViewer.");
-                setImagesLoadedIntoViewer(true); // Force loaded state to unblock UI
-            }
-        }, 30000);
+        // Get the viewer instance for the specific ID we used
+        // const viewer = window.papaya?.Container?.getViewer(PAPAYA_DIV_ID);
+        // Alternatively, if it's definitely the first viewer:
+        console.log("I goona loading pls don't gone")
+        console.log("yess dowload finish")
+        console.log(viewer)
+        if (viewer && viewer.isReady && viewer.imageData && viewer.imageData.images?.length > 0) {
+            console.log("✅ Papaya viewer reports images loaded and is ready.");
+            clearInterval(imageLoadCheckInterval);
+            setImagesLoadedIntoViewer(true);
+        } else {
+            // This might indicate the viewer isn't ready or images haven't propagated yet
+            console.log("Papaya viewer not yet ready or no images loaded internally. Retrying check...");
+        }
 
         return () => {
-          clearInterval(imageLoadCheckInterval);
-          clearTimeout(imageLoadTimeout);
+          // clearInterval(imageLoadCheckInterval);
+          // clearTimeout(imageLoadTimeout);
         };
 
       } catch (error) {
@@ -208,7 +218,7 @@ export default function PapayaViewer({ images = [] }) {
         <div
           ref={papayaViewerContainerRef}
           className="papaya"
-          id={PAPAYA_DIV_ID} // --- MODIFICATION HERE: Assign the ID to the div ---
+          id="papaya-viewer-main"// --- MODIFICATION HERE: Assign the ID to the div ---
           style={{
             visibility: (papayaShellStarted && (!images?.length || imagesLoadedIntoViewer)) ? "visible" : "hidden",
             width: "100%",

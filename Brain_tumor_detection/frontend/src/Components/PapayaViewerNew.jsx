@@ -1,30 +1,38 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { loadPapayaOnce } from "../utils/loadPapayaOnce";
 
-export default function PapayaViewer({ images }) {
+export default function PapayaViewer({ viewerParams }) {
+  const containerRef = useRef(null);
+
   useEffect(() => {
-    if (!images || images?.length === 0 || !window.papaya) return;
+    const setupPapaya = async () => {
+      await loadPapayaOnce(); // โหลด papaya.js + css
 
-    const params = {
-      images, // Just pass the array of image URLs
-      [images[2]]: { lut: "Red Overlay", alpha: 0.5 }, // Segmentation overlay
-      showControlBar: true,
-      kioskMode: false
+      const papayaDiv = containerRef.current;
+      if (!papayaDiv) {
+        console.warn("📛 containerRef ยังไม่พร้อม");
+        return;
+      }
+
+      // สำคัญ! ให้แน่ใจว่า ID ตรงกับ div จริง ๆ
+      papayaDiv.id = "papaya-container";
+
+      // Add Viewer
+      if (window.papaya?.Container) {
+        console.log("✨ เรียก addViewer");
+        window.papaya.Container.addViewer("papaya-container", viewerParams);
+      } else {
+        console.error("❌ Papaya.Container ไม่พร้อม");
+      }
     };
 
-    window.papaya.Container.resetViewer(0, params);
-  }, [images]);
-  
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (window.papaya && window.papaya.Container) {
-        window.papaya.Container.startPapaya();
-        clearInterval(interval);
-      }
-      console.log("eiei");
-    }, 200); // check every 200ms
-  
-    return () => clearInterval(interval);
-  }, []);
+    setupPapaya();
+  }, [viewerParams]);
 
-  return <div className="papaya"></div>;
+  return (
+    <div
+      ref={containerRef}
+      style={{ width: "100%", height: "600px" }}
+    />
+  );
 }
