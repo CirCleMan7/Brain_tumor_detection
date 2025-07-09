@@ -189,7 +189,7 @@ def format_slice_ranges(slice_numbers: List[int]) -> str:
 # ----------- Flowise API -----------
 @app.post("/flowise")
 async def ask_flowise(req: Request):
-    return {"error": "FLOWISE_API_URL is not set in environment variables"}
+    # return {"error": "FLOWISE_API_URL is not set in environment variables"}
     print("📨 Flowise request received")
     if not FLOWISE_API_URL:
         return {"error": "FLOWISE_API_URL is not set in environment variables"}
@@ -479,7 +479,7 @@ async def submit_case(
             t1ce_filename  = f"t1ce_{case_id}.nii"
             seg_filename   = f"seg_{case_id}.nii"
 
-            save_dir = "static/files"
+            save_dir = "static/files/3D_images"
             os.makedirs(save_dir, exist_ok=True)
 
             flair_path = os.path.join(save_dir, flair_filename)
@@ -496,7 +496,7 @@ async def submit_case(
 
             print("process 3")
 
-            base_url = "http://localhost:8000/files"
+            base_url = "http://localhost:8000/files/3D_images"
             return {
                 "reply": f"🧠 3D segmentation complete with labels: {', '.join(predicted_labels)}",
                 "predicted_labels": predicted_labels,
@@ -518,7 +518,7 @@ async def submit_case(
             # Save uploaded image
             case_id = str(uuid.uuid4())
             filename = f"2d_input_{uuid.uuid4().hex}_{flair_file.filename}"
-            save_dir = "static/files/2D_image"
+            save_dir = "static/files/2D_images"
             os.makedirs(save_dir, exist_ok=True)
             filepath = os.path.join(save_dir, filename)
 
@@ -589,7 +589,7 @@ async def submit_case(
 
             tumor_type_predict = get_detected_tumor_types(pred)
 
-            base_url = "http://localhost:8000/files/2D_image"
+            base_url = "http://localhost:8000/files/2D_images"
             return {
                 "reply": "✅ 2D brain segmentation complete.",
                 "image_urls": [
