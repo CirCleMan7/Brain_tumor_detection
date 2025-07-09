@@ -223,36 +223,10 @@ export default function App() {
       console.log(data);
 
       const info = is2D ? `Tumor type from predict : ${data.tumor_type_predict} and testIndication ${content.testIndication}` : `data.predicted_labels : ${data.predicted_labels}, tumor_volume : ${data.tumor_volume}, tumor_slices : ${data.tumor_slices} and testIndication ${content.testIndication}`;
+      
 
       const viewerImages = data.image_urls;
-      console.log("this is my image file");
-      console.log(data.image_urls[0]);
-
-      // const imageMarkdown = d
-      // const aiPrompt = `
-      // 🧠 Brain Tumor Analysis Report
-
-      // 🔍 Case Details:
-      // - Test Indication: ${content.testIndication}
-      // - Scan Dimension: ${content.selectedDimension}
-      // - Sample Collection Date: ${content.sampleCollectionDate}
-
-      // 👤 Patient Information:
-      // - Patient ID: ${content.patientId}
-      // - Name: ${content.patientFirstName} ${content.patientLastName}
-
-      // 👨‍⚕️ Referring Doctor:
-      // - Name: Dr. ${content.doctorFirstName} ${content.doctorLastName}
-
-      // 📊 Model Output:
-      // ${info}
-
-      // 📝 Based on the provided case information and model output, please offer any clinical insights, follow-up recommendations, or further tests you would advise. The more comprehensive, the better. Can you also describe what do you think about image that we send. what is your opinion
-      // `.trim();
-
       const basePrompt = `Please describe what is ${info} and suggested for treatment based on providing guidance.`;
-
-
       const dataofModel = "this is a 2D brain which have overlay on a tumor"
 
       // Optionally send to Gemini

@@ -45,7 +45,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
       const res = await fetch("http://localhost:8000/flowise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: userPrompt }),
+        body: JSON.stringify({ question: userPrompt }),
         signal: abortController?.signal,
       });
       
@@ -250,20 +250,16 @@ export default function ChatPage({ chats, setChats, showModal }) {
   const [viewerParams, setViewerParams] = useState(null);
 
   const loadExampleImages = () => {
-    console.log("check")
-    console.log(chat.content.viewerImages[0])
-    console.log(chat.content.viewerImages[1])
-    console.log(chat.content.viewerImages[2])
     setViewerParams({
       images: [
         chat.content.viewerImages[0],  // base image
-        chat.content.viewerImages[1],  // overlay image
+        chat.content.viewerImages[2],  // overlay image
       ],
       kioskMode: false,
       showControlBar: true,
       smoothDisplay: false,
       // กำหนดพารามิเตอร์ overlay ตามชื่อไฟล์
-      [chat.content.viewerImages[1]]: {
+      [chat.content.viewerImages[2]]: {
         lut: "Red Overlay",
         alpha: 0.5,
         min: 0,
