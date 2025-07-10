@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 import "./App.css"
 import Introduction from "./Components/Introduction";
 import { useNavigate } from "react-router-dom";
-import { toDataURL } from "./utils/toDataURL";
 
 const formatMetrics = (metrics) => {
   if (!metrics) return "No metrics available.";
@@ -25,109 +24,12 @@ const formatMetrics = (metrics) => {
   return metricStrings.join('\n');
 };
 
-async function sendImageAndTextToFlowiseFromUrl(content, info, imageUrl) {
-  // 1. Construct the aiPrompt as you already have it
-  // const aiPrompt = `
-  //     🧠 Brain Tumor Analysis Report
-
-  //     🔍 Case Details:
-  //     - Test Indication: ${content.testIndication}
-  //     - Scan Dimension: ${content.selectedDimension}
-  //     - Sample Collection Date: ${content.sampleCollectionDate}
-
-  //     👤 Patient Information:
-  //     - Patient ID: ${content.patientId}
-  //     - Name: ${content.patientFirstName} ${content.patientLastName}
-
-  //     👨‍⚕️ Referring Doctor:
-  //     - Name: Dr. ${content.doctorFirstName} ${content.doctorLastName}
-
-  //     📊 Model Output:
-  //     ${info}
-
-  //     📝 Based on the provided case information and model output, please offer any clinical insights, follow-up recommendations, or further tests you would advise. The more comprehensive, the better.
-  //     `.trim();
-
+async function sendToFlowise(content) {
   try {
-    // 2. Fetch the image from the provided URL
-    console.log("Type of imageUrl:", typeof imageUrl);
-    console.log("Value of imageUrl:", imageUrl)
-    console.log("image 1")
-    console.log(imageUrl[2]);
-    
-    // const image = imageUrl[2];
-    
-    const response = await fetch(imageUrl);
-    console.log("Content-Type:", response.headers.get("Content-Type"));
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch image from URL: ${response.status} ${response.statusText}`);
-    }
-    
-    const imageBlob = await response.blob(); // Get the image as a Blob
-    console.log("Blob type:", imageBlob.type);
-
-    // Determine MIME type. You might need a more robust way if the server doesn't send it.
-    // Ideally, the server should set the Content-Type header correctly.
-    // If not, you might infer it from the URL's extension or use a default.
-    const mimeType = response.headers.get('Content-Type') || 'application/octet-stream';
-    const fileName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1); // Extract filename from URL
-
-    // 3. Read the Blob as a Data URL (Base64)
-    const reader = new FileReader();
-
-    // This returns a Promise-like behavior, so we wrap it for async/await
-    const base64Data = await new Promise((resolve, reject) => {
-      reader.onload = (event) => {
-        const fullDataUrl = event.target.result; // "data:image/png;base64,..."
-        const base64Only = fullDataUrl.split(",")[1]; // Cut off "data:image/png;base64,"
-        resolve(base64Only);
-      };
-      reader.onerror = (error) => {
-        reject(error);
-      };
-      reader.readAsDataURL(imageBlob);
-    });    
-
-    console.log()
-
-
-    if (!content || typeof content !== "string") {
-      throw new Error("Content (question) must be a valid string");
-    }
-    
-    if (!base64Data) {
-      throw new Error("Base64 image data is missing");
-    }
-    
-    if (!fileName) {
-      throw new Error("File name is missing");
-    }
-    
-    if (!mimeType) {
-      throw new Error("Mime type is missing");
-    }
-    
-
-    // 4. Construct the request body with both 'question' and 'uploads'
     const requestBody = {
-      question: content, // Your text prompt goes here
-      uploads: [
-        {
-          data: base64Data, // Base64 encoded image data
-          type: "file",
-          name: fileName,
-          mime: mimeType,
-        },
-      ],
-      // Add other optional parameters like history, sessionId, overrideConfig if needed
-      // history: [],
-      // sessionId: "your-session-id-here",
+      question: content,
     };
 
-    // 5. Send the request to Flowise
-    // Replace <CHATFLOW_ID> with the actual ID of your Flowise chatflow.
-    // You can find this in your Flowise UI when you deploy or publish a chatflow.
     const flowiseRes = await fetch("http://localhost:8000/flowise", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -204,10 +106,6 @@ export default function App() {
         formData.append("t1ceFiles", content.t1ceFiles[0]);
       }
 
-      // if (content.other instanceof File) {
-      //   formData.append("files", content.other); // "files" = the general file field
-      // }
-      
       const res = await fetch("http://localhost:8000/submit_case", {
         method: "POST",
         body: formData,
@@ -219,48 +117,34 @@ export default function App() {
       }      
       
       const data = await res.json();
-      console.log("data")
-      console.log(data);
 
-      const info = is2D ? `Tumor type from predict : ${data.tumor_type_predict} and testIndication ${content.testIndication}` : `data.predicted_labels : ${data.predicted_labels}, tumor_volume : ${data.tumor_volume}, tumor_slices : ${data.tumor_slices} and testIndication ${content.testIndication}`;
+      const info = is2D ? `Tumor type from predict : ${data.tumor_type_predict} and testIndication ${content.testIndication}` : `predicted_labels : ${data.predicted_labels}, tumor_volume : ${data.tumor_volume}, tumor_slices : ${data.tumor_slices} and testIndication ${content.testIndication}`;
       
 
       const viewerImages = data.image_urls;
       const basePrompt = `Please describe what is ${info} and suggested for treatment based on providing guidance.`;
-      const dataofModel = "this is a 2D brain which have overlay on a tumor"
 
-      // Optionally send to Gemini
-      // const flowiseRes = await fetch("http://localhost:8000/flowise", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ prompt: aiPrompt }),
-      // });
-
-
-
-      // const flowiseData = await flowiseRes.json();
-
-      const flowiseData = await sendImageAndTextToFlowiseFromUrl(basePrompt, dataofModel, data.image_urls[0]);
+      const flowiseData = await sendToFlowise(basePrompt);
       console.log("flowise content");
-      console.log(flowiseData)
       const aiReply = flowiseData.reply?.text || "❌ Failed to connect AI.";
-
-      // Assume backend returns .images only for 2D, and maybe slices or imageURL for 3D
-      // Assume backend returns .images only for 2D, and maybe image_url + predicted_labels for 3D
+      console.log(flowiseData)
+      
       let conversation = [{ sender: "ai", text: "✅ Case processed successfully." }];
-
+      
       if (is2D && data.images?.length) {
         conversation.push({ sender: "ai", text: "🖼️ Detected 2D images from your file." });
       }
-
+      
       if (is3D) {
         conversation.push({ sender: "ai", text: "🧠 Detected 3D scan (NIfTI). Opening viewer..." });
-
+        
+        console.log("data : ")
+        console.log(data);
         // ✅ Include predicted tumor labels (optional)
         if (data.predicted_labels?.length) {
           conversation.push({
             sender: "ai",
-            text: `🧪 Tumor Types Detected: ${data.predicted_labels.join(", ")}`,
+            text: `🧪 Tumor Types Detected: ${data.predicted_labels}`,
           });
         }
       }
@@ -291,9 +175,7 @@ export default function App() {
       
 
       conversation.push({ sender: "ai", text: aiReply });
-      // Now include all 3 in order: FLAIR, T1CE, Segmentation
-      
-      // const viewerImages = data.image_urls;
+
       // ✅ Update chat state with additional 3D image url (or 2D image previews)
       setChats((prevChats) =>
         prevChats.map((c) =>
