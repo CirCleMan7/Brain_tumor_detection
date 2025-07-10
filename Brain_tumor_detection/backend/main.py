@@ -58,7 +58,7 @@ app.mount("/files", NoCacheStaticFiles(directory="static/files"), name="files")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],  # secure this in prod
+    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],  # secure this in prod
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -434,10 +434,11 @@ async def submit_case(
             processed, voxel_dims, original_shape = preprocess_nifti(flair_bytes, t1ce_bytes)
             raw_prediction = model.predict(processed)
 
-            max_probs = np.max(raw_prediction, axis=-1)
-            class_indices = np.argmax(raw_prediction, axis=-1)
-            mask = np.zeros_like(class_indices, dtype=np.uint8)
-            mask[max_probs >= 0.5] = class_indices[max_probs >= 0.5]
+            # max_probs = np.max(raw_prediction, axis=-1)
+            # class_indices = np.argmax(raw_prediction, axis=-1)
+            # mask = np.zeros_like(class_indices, dtype=np.uint8)
+            # mask[max_probs >= 0.5] = class_indices[max_probs >= 0.5]
+            mask = np.argmax(raw_prediction, axis=-1).astype(np.uint8)
 
             print("process 2")
 
@@ -471,7 +472,10 @@ async def submit_case(
             tumor_slices_str = format_slice_ranges(tumor_slices_numbers)
 
             unique_labels = np.unique(mask)
-            predicted_labels = [SEGMENT_CLASSES[i] for i in unique_labels if i in SEGMENT_CLASSES]
+            predicted_labels_list = [label for label in unique_labels if label in SEGMENT_CLASSES and label != 0]
+            predicted_labels_str = ", ".join([SEGMENT_CLASSES[label] for label in predicted_labels_list]) if predicted_labels_list else "Not found"
+
+            print(predicted_labels_str)
 
             # --- Save NIfTI files ---
             case_id = str(uuid.uuid4())
@@ -498,8 +502,8 @@ async def submit_case(
 
             base_url = "http://localhost:8000/files/3D_images"
             return {
-                "reply": f"🧠 3D segmentation complete with labels: {', '.join(predicted_labels)}",
-                "predicted_labels": predicted_labels,
+                "reply": f"🧠 3D segmentation complete with labels: {predicted_labels_str}",
+                "predicted_labels": predicted_labels_str,
                 "tumor_volume": volume_str,
                 "tumor_slices": tumor_slices_str,
                 "image_urls": [
