@@ -4,15 +4,10 @@ import ReactMarkdown from "react-markdown";
 import "./chat.css";
 import "./arrow.css";
 import ChatInput from "./ChatInput";
-import PapayaViewer from "./../PapayaViewer"
 import PapayaViewerNew from "./../PapayaViewerNew"
 import Show2DImage from "./Show2DImage";
-import { loadPapayaOnce } from "./../../utils/loadPapayaOnce";
 
-// eslint-disable-next-line no-undef
-const papaya = window.papaya;
-
-export default function ChatPage({ chats, setChats, showModal }) {
+export default function ChatPage({ chats, setChats}) {
 
   const { id } = useParams();
   const chat = chats.find((c) => c.id === id);
@@ -25,8 +20,12 @@ export default function ChatPage({ chats, setChats, showModal }) {
   // Update conversation whenever chat changes (like switching chats)
   useEffect(() => {
     setConversation(chat?.conversation || []);
-    setShowImage(false);
   }, [chat]);
+
+  useEffect(() => {
+    setShowImage(false);
+  }, [chat?.topic]);
+
 
   useEffect(() => {
     setShowImage(false);
@@ -38,9 +37,6 @@ export default function ChatPage({ chats, setChats, showModal }) {
     const controller = new AbortController();
     setAbortController(controller);
     
-    console.log("Conversation");
-    console.log(chat)
-
     try {
       const res = await fetch("http://localhost:8000/flowise", {
         method: "POST",
@@ -137,116 +133,6 @@ export default function ChatPage({ chats, setChats, showModal }) {
     return () => chatLog.removeEventListener("scroll", handleScroll);
   }, [conversation]);
 
-
-  // const [papayaReady, setPapayaReady] = useState(false);
-
-  
-  // useEffect(() => {
-  // if (!showScrollButton && bottomRef.current) {
-  //     bottomRef.current.scrollIntoView("smooth");
-  //   }
-  // }, [conversation]);
-  // ==============================================================================
-  // papaya viewer
-  
-  // useEffect(() => {
-  //   const jqueryScript = document.createElement("script");
-  //   jqueryScript.src = "https://code.jquery.com/jquery-3.6.0.min.js";
-  //   jqueryScript.async = true;
-    
-  //   const cleanup = [];
-    
-  //   jqueryScript.onload = () => {
-  //     const css = document.createElement("link");
-  //     css.rel = "stylesheet";
-  //     css.href = "/papaya.css";
-  //     document.head.appendChild(css);
-  //     cleanup.push(() => document.head.removeChild(css));
-      
-  //     window.papaya = window.papaya || {};
-  //     window.papaya.params = {
-  //       images: ["/Users/sakonkiat/Desktop/SuperAI-Brain_Tumor/fastapi-brain-segmentation/data/BraTS20_Training_002_flair.nii"]
-  //     };
-      
-  //     const papayaScript = document.createElement("script");
-  //     papayaScript.src = "/papaya.js";
-  //     papayaScript.async = true;
-      
-  //     papayaScript.onerror = () => {
-  //       console.error("Failed to load papaya.js");
-  //     };
-      
-  //     let timeout = setTimeout(() => {
-  //       console.warn("Papaya load timeout.");
-  //     }, 10000);
-      
-  //     papayaScript.onload = () => {
-  //       clearTimeout(timeout);
-        
-  //       const waitForPapayaDiv = () => {
-  //         const maxTries = 20;
-  //         let tries = 0;
-          
-  //         const interval = setInterval(() => {
-  //           const papayaDiv = document.querySelector(".papaya");
-  //           if (papayaDiv) {
-  //             clearInterval(interval);
-              
-  //             if (window.papaya.Container.viewer) {
-  //               window.papaya.Container.resetViewer(0, true);
-  //             }
-              
-  //             window.papaya.Container.startPapaya();
-  //           } else if (++tries >= maxTries) {
-  //             clearInterval(interval);
-  //             console.warn("Could not find .papaya div.");
-  //           }
-  //         }, 200);
-  //       };
-        
-  //       waitForPapayaDiv();
-  //     };
-      
-  //     document.body.appendChild(papayaScript);
-  //     cleanup.push(() => document.body.removeChild(papayaScript));
-  //   };
-    
-  //   document.body.appendChild(jqueryScript);
-  //   cleanup.push(() => document.body.removeChild(jqueryScript));
-    
-  //   return () => {
-  //     cleanup.forEach((fn) => fn());
-  //     if (window.papaya && window.papaya.Container && window.papaya.Container.viewer) {
-  //       window.papaya.Container.resetViewer(0, true);
-  //     }
-  //   };
-  // }, []);
-  
-  // useEffect(() => {
-  //   // Start Papaya on mount
-  //   if (
-  //     window.papaya &&
-  //     window.papaya.Container &&
-  //     document.querySelector(".papaya")
-  //     ) {
-  //       window.papaya.Container.startPapaya();
-  //       setTimeout(() => {
-  //         window.papaya.Container.resizeViewerComponents(); // 🪄 Fix layout glitch
-  //       }, 300);
-  //     }
-      
-  //     // Clean up on unmount
-  //     return () => {
-    //       if (
-      //           window.papaya?.Container?.viewer?.length > 0
-      //         ) {
-        //           window.papaya.Container.resetViewer(0, true);
-        //         }
-        //       };
-        //     }, []);
-        
-        // ==============================================================================
-
   const [viewerParams, setViewerParams] = useState(null);
 
   const loadExampleImages = () => {
@@ -272,9 +158,6 @@ export default function ChatPage({ chats, setChats, showModal }) {
     image: path,
     name: `image_${i + 1}`,
   })) || [];
-  
-  const papayaDivRef = useRef(null);
-  const [papayaReady, setPapayaReady] = useState(false);
   
   // ==============================================================================
   // for make a scroll page only 2D 
@@ -322,28 +205,6 @@ export default function ChatPage({ chats, setChats, showModal }) {
   };
 
   const [viewerKey, setViewerKey] = useState(0);
-
-  const handlePredict = async () => {
-    // หลังจากส่ง request ไป backend แล้วได้ blob + file
-    // console.log(chat)
-    const baseImageDataURL = chat.content.viewerImages[0];
-    const segDataURL = chat.content.viewerImages[2];
-
-    const params = {
-      images: [baseImageDataURL, segDataURL],
-      kioskMode: false,
-      showControlBar: true,
-      smoothDisplay: false,
-    };
-    params[segDataURL] = {
-      lut: "Red Overlay",
-      alpha: 0.5,
-      min: 0,
-      max: 3,
-    };
-
-    setViewerParams(params); // <<< trigger ให้ Papaya render
-  };
 
   const handleCloseViewer = () => {
     setShowImage(false);
@@ -407,7 +268,7 @@ export default function ChatPage({ chats, setChats, showModal }) {
             onClick={handleOpenViewer}
           />
         )}
-  
+
         <div key={chat.id} className="chat-log" ref={chatLogRef}>
           {conversation.map((msg, index) => (
             <div key={index} className={`message ${msg.sender}`}>
@@ -426,8 +287,6 @@ export default function ChatPage({ chats, setChats, showModal }) {
           ))}
           <div ref={bottomRef} />
         </div>
-
-        {/* <div className="papaya"></div> */}
   
         <ChatInput
           input={input}
