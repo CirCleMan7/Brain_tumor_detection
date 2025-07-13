@@ -13,9 +13,47 @@ export default function Sidebar({ chats, setChats, setShowModal }) {
     fileInputRef.current.click();
   };
 
-  function removeChat(id) {
-    setChats(prev => prev.filter(chat => chat.id !== id));
+  async function deleteFile(fileUrl) {
+    try {
+      // Convert URL to relative path (e.g., remove http://localhost:8000/)
+      const relativePath = fileUrl.replace("http://localhost:8000/", "");
+  
+      const res = await fetch(`http://localhost:8000/delete_file?filepath=static/${relativePath}`, {
+        method: "DELETE",
+      });
+  
+      const result = await res.json();
+  
+      if (res.ok) {
+        console.log("✅ File deleted:", result.detail);
+      } else {
+        console.error("❌ Failed to delete:", result.detail);
+      }
+    } catch (error) {
+      console.error("❌ Error deleting file:", error.message);
+    }
   }
+  
+
+  async function removeChat(id) {
+    // 1. Find the chat with the given id
+    const chat = chats.find(c => c.id === id);
+  
+    if (!chat) {
+      console.warn(`Chat with id ${id} not found.`);
+      return;
+    }
+  
+    // 2. Delete all related image files
+    if (chat.content?.viewerImages?.length) {
+      for (const img of chat.content.viewerImages) {
+        await deleteFile(img); // assuming img.image is the URL
+      }
+    }
+  
+    // 3. Remove the chat from state
+    setChats(prev => prev.filter(c => c.id !== id));
+  }  
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];

@@ -17,7 +17,7 @@ import base64
 import httpx
 
 # === FastAPI & Starlette ===
-from fastapi import FastAPI, Request, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, Request, UploadFile, File, Form, HTTPException, Query
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
@@ -405,6 +405,22 @@ async def ask_gemini(req: Request):
             }
         )
 
+@app.delete("/delete_file")
+async def delete_file(filepath: str = Query(..., description="Path to the file to delete")):
+    abs_path = os.path.abspath(filepath)
+
+    if not abs_path.startswith(os.path.abspath("static/files")):
+        raise HTTPException(status_code=403, detail="Invalid file path")
+
+    if not os.path.exists(abs_path):
+        raise HTTPException(status_code=404, detail="File not found")
+
+    try:
+        os.remove(abs_path)
+        return {"detail": "File deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting file: {str(e)}")
+
 
 # === Main /submit_case ===
 @app.post("/submit_case")
@@ -592,6 +608,12 @@ async def submit_case(
             metrics = evaluate_array(pred_mask=pred, true_mask=mask_array) if mask_array is not None else None
 
             tumor_type_predict = get_detected_tumor_types(pred)
+
+            # ❌ Clean up the uploaded input file after processing
+            try:
+                os.remove(filepath)
+            except FileNotFoundError:
+                pass
 
             base_url = "http://localhost:8000/files/2D_images"
             return {
