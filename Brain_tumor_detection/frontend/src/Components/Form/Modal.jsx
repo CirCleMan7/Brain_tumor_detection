@@ -123,12 +123,12 @@ export default function Modal({ onClose, onSubmit, chats }) {
         <form onSubmit={handleSubmit}>
           <div className="form-row">
             <div className="input-data">
-              <input type="text" value={patientFirstName} onChange={(e) => setPatientFirstName(e.target.value)} required />
+              <input type="text" value={patientFirstName} onChange={(e) => setPatientFirstName(e.target.value)} />
               <div className="underline"></div>
               <label>Patient First Name</label>
             </div>
             <div className="input-data">
-              <input type="text" value={patientLastName} onChange={(e) => setPatientLastName(e.target.value)} required />
+              <input type="text" value={patientLastName} onChange={(e) => setPatientLastName(e.target.value)} />
               <div className="underline"></div>
               <label>Patient Last Name</label>
             </div>
@@ -149,7 +149,7 @@ export default function Modal({ onClose, onSubmit, chats }) {
 
           <div className="form-row">
             <div className="input-data">
-              <input type="text" value={patientId} onChange={(e) => setPatientId(e.target.value)} />
+              <input type="text" value={patientId} onChange={(e) => setPatientId(e.target.value)} required />
               <div className="underline"></div>
               <label>Patient ID</label>
             </div>
@@ -188,116 +188,114 @@ export default function Modal({ onClose, onSubmit, chats }) {
           </div>
 
           {selectedDimension === "2D" ? (
-  <>
-    {/* Brain Image Upload */}
-    <div className="form-row">
-      <div className="file-upload-section">
-        <div className="file-upload-header">
-          <h3>2D Brain Image (.png, .jpg, .npy, .nii, .nii.gz):</h3>
-          <button type="button" onClick={handleFlairClick} className={buttonStyles["add-file-button"]}>Upload Image</button>
-        </div>
-        <input 
-          type="file" 
-          ref={flairFileInputRef} 
-          onChange={handleFlairFileChange} 
-          accept=".png,.jpg,.jpeg,.npy,.nii,.nii.gz"
-          style={{ display: "none" }} 
-        />
-        <div className="file-list">
-          {flairFiles.map((file, index) => (
-            <div key={index} className="file-item">
-              <span>{getFileIcon(file.name)}</span>
-              <span className="file-name">{file.name}</span>
-              <button type="button" onClick={() => handleRemoveFlairFile(index)} className="remove-file-btn">✖</button>
+          <>
+            {/* Brain Image Upload */}
+            <div className="form-row">
+              <div className="file-upload-section">
+                <div className="file-upload-header">
+                  <h3>2D Brain Image (.png, .jpg, .npy, .nii, .nii.gz):</h3>
+                  <button type="button" onClick={handleFlairClick} className={buttonStyles["add-file-button"]}>Upload Image</button>
+                </div>
+                <input 
+                  type="file" 
+                  ref={flairFileInputRef} 
+                  onChange={handleFlairFileChange} 
+                  accept=".png,.jpg,.jpeg,.npy,.nii,.nii.gz"
+                  style={{ display: "none" }} 
+                />
+                <div className="file-list">
+                  {flairFiles.map((file, index) => (
+                    <div key={index} className="file-item">
+                      <span>{getFileIcon(file.name)}</span>
+                      <span className="file-name">{file.name}</span>
+                      <button type="button" onClick={() => handleRemoveFlairFile(index)} className="remove-file-btn">✖</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </div>
 
-    {/* Mask Image Upload */}
-    <div className="form-row">
-      <div className="file-upload-section">
-        <div className="file-upload-header">
-          <h3>Mask Image (same formats):</h3>
-          <button type="button" onClick={handleT1ceClick} className={buttonStyles["add-file-button"]}>Upload Mask</button>
-        </div>
-        <input 
-          type="file" 
-          ref={t1ceFileInputRef} 
-          onChange={handleT1ceFileChange} 
-          accept=".png,.jpg,.jpeg,.npy,.nii,.nii.gz"
-          style={{ display: "none" }} 
-        />
-        <div className="file-list">
-          {t1ceFiles.map((file, index) => (
-            <div key={index} className="file-item">
-              <span>{getFileIcon(file.name)}</span>
-              <span className="file-name">{file.name}</span>
-              <button type="button" onClick={() => handleRemoveT1ceFile(index)} className="remove-file-btn">✖</button>
+            {/* Mask Image Upload */}
+            <div className="form-row">
+              <div className="file-upload-section">
+                <div className="file-upload-header">
+                  <h3>Mask Image (same formats):</h3>
+                  <button type="button" onClick={handleT1ceClick} className={buttonStyles["add-file-button"]}>Upload Mask</button>
+                </div>
+                <input 
+                  type="file" 
+                  ref={t1ceFileInputRef} 
+                  onChange={handleT1ceFileChange} 
+                  accept=".png,.jpg,.jpeg,.npy,.nii,.nii.gz"
+                  style={{ display: "none" }} 
+                />
+                <div className="file-list">
+                  {t1ceFiles.map((file, index) => (
+                    <div key={index} className="file-item">
+                      <span>{getFileIcon(file.name)}</span>
+                      <span className="file-name">{file.name}</span>
+                      <button type="button" onClick={() => handleRemoveT1ceFile(index)} className="remove-file-btn">✖</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </>
-) : (
-  <>
-    {/* FLAIR Upload for 3D */}
-    <div className="form-row">
-      <div className="file-upload-section">
-        <div className="file-upload-header">
-          <h3>FLAIR Scan (.nii or .nii.gz):</h3>
-          <button type="button" onClick={handleFlairClick} className={buttonStyles["add-file-button"]}>Upload FLAIR</button>
-        </div>
-        <input 
-          type="file" 
-          ref={flairFileInputRef} 
-          onChange={handleFlairFileChange} 
-          accept=".nii,.nii.gz"
-          style={{ display: "none" }} 
-        />
-        <div className="file-list">
-          {flairFiles.map((file, index) => (
-            <div key={index} className="file-item">
-              <span>{getFileIcon(file.name)}</span>
-              <span className="file-name">{file.name}</span>
-              <button type="button" onClick={() => handleRemoveFlairFile(index)} className="remove-file-btn">✖</button>
+          </>
+        ) : (
+          <>
+            {/* FLAIR Upload for 3D */}
+            <div className="form-row">
+              <div className="file-upload-section">
+                <div className="file-upload-header">
+                  <h3>FLAIR Scan (.nii or .nii.gz):</h3>
+                  <button type="button" onClick={handleFlairClick} className={buttonStyles["add-file-button"]}>Upload FLAIR</button>
+                </div>
+                <input 
+                  type="file" 
+                  ref={flairFileInputRef} 
+                  onChange={handleFlairFileChange} 
+                  accept=".nii,.nii.gz"
+                  style={{ display: "none" }} 
+                />
+                <div className="file-list">
+                  {flairFiles.map((file, index) => (
+                    <div key={index} className="file-item">
+                      <span>{getFileIcon(file.name)}</span>
+                      <span className="file-name">{file.name}</span>
+                      <button type="button" onClick={() => handleRemoveFlairFile(index)} className="remove-file-btn">✖</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </div>
 
-    {/* T1CE Upload for 3D */}
-    <div className="form-row">
-      <div className="file-upload-section">
-        <div className="file-upload-header">
-          <h3>T1CE Scan (.nii or .nii.gz):</h3>
-          <button type="button" onClick={handleT1ceClick} className={buttonStyles["add-file-button"]}>Upload T1CE</button>
-        </div>
-        <input 
-          type="file" 
-          ref={t1ceFileInputRef} 
-          onChange={handleT1ceFileChange} 
-          accept=".nii,.nii.gz"
-          style={{ display: "none" }} 
-        />
-        <div className="file-list">
-          {t1ceFiles.map((file, index) => (
-            <div key={index} className="file-item">
-              <span>{getFileIcon(file.name)}</span>
-              <span className="file-name">{file.name}</span>
-              <button type="button" onClick={() => handleRemoveT1ceFile(index)} className="remove-file-btn">✖</button>
+            {/* T1CE Upload for 3D */}
+            <div className="form-row">
+              <div className="file-upload-section">
+                <div className="file-upload-header">
+                  <h3>T1CE Scan (.nii or .nii.gz):</h3>
+                  <button type="button" onClick={handleT1ceClick} className={buttonStyles["add-file-button"]}>Upload T1CE</button>
+                </div>
+                <input 
+                  type="file" 
+                  ref={t1ceFileInputRef} 
+                  onChange={handleT1ceFileChange} 
+                  accept=".nii,.nii.gz"
+                  style={{ display: "none" }} 
+                />
+                <div className="file-list">
+                  {t1ceFiles.map((file, index) => (
+                    <div key={index} className="file-item">
+                      <span>{getFileIcon(file.name)}</span>
+                      <span className="file-name">{file.name}</span>
+                      <button type="button" onClick={() => handleRemoveT1ceFile(index)} className="remove-file-btn">✖</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </>
-)}
-
-
+          </>
+        )}
 
           <div className="form-row submit-btn">
             <div className="input-data">
