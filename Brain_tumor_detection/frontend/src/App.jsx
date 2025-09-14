@@ -30,7 +30,7 @@ async function sendToFlowise(content) {
       question: content,
     };
 
-    const flowiseRes = await fetch("http://localhost:8000/flowise", {
+    const flowiseRes = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/flowise", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestBody),
@@ -106,7 +106,7 @@ export default function App() {
         formData.append("t1ceFiles", content.t1ceFiles[0]);
       }
 
-      const res = await fetch("http://localhost:8000/submit_case", {
+      const res = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/submit_case", {
         method: "POST",
         body: formData,
       });
