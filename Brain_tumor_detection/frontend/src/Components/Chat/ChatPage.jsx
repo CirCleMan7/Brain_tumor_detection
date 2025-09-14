@@ -38,7 +38,7 @@ export default function ChatPage({ chats, setChats}) {
     setAbortController(controller);
     
     try {
-      const res = await fetch("http://localhost:8000/flowise", {
+      const res = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/flowise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: userPrompt }),
