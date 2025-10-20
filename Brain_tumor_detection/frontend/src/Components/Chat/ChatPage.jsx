@@ -284,9 +284,19 @@ export default function ChatPage({ chats, setChats }) {
                 )}
                 <div className="bubble">
                   {/* <div style={{ display: "flex", alignItems: "center", gap: "8px" }}> */}
-                    {msg.process ? (<div className="fade-text text-gray-500"><ReactMarkdown>{msg.text}</ReactMarkdown></div>) : (<ReactMarkdown>{msg.text}</ReactMarkdown>)}
-                    {msg.process ? (<div className="loading loading-spinner loading-sm"></div>) : null}
+                    {/* {msg.process ? (<div className="fade-text text-gray-500"><ReactMarkdown>{msg.text}</ReactMarkdown></div>) : (<ReactMarkdown>{msg.text}</ReactMarkdown>)}
+                    {msg.process ? (<div className="loading loading-spinner loading-sm"></div>) : null} */}
                   {/* </div> */}
+                  {msg.process ? (
+                  <div className="flex items-center gap-2">
+                    <div className="fade-text text-gray-500">
+                      <ReactMarkdown>{msg.text}</ReactMarkdown>
+                    </div>
+                    <div className="loading loading-spinner loading-sm"></div>
+                  </div>
+                  ) : (
+                    <ReactMarkdown>{msg.text}</ReactMarkdown>
+                  )}
                 </div>
               </div>
             </div>
