@@ -188,21 +188,21 @@ export default function App() {
         text: 
           "# 🧠 Brain Tumor Segmentation Report\n" +
           "# 👨‍⚕️ Doctor\n" +
-          `## ${content.doctorFirstName} ${content.doctorLastName}\n` +
+          `${content.doctorFirstName} ${content.doctorLastName}\n` +
           "# 👤 Patient\n" +
-          `## ${content.patientFirstName} ${content.patientLastName}\n` +
-          `🆔 Patient ID: \`${content.patientId}\`\n` +
+          `${content.patientFirstName} ${content.patientLastName}\n` +
+          `🆔 Patient ID: ${content.patientId}\n` +
           "# 📅 Sample Collection Date\n" +
-          `## ${content.sampleCollectionDate}\n` +
+          `${content.sampleCollectionDate}\n` +
           "# 🔬 Test Indication\n" +
-          `## ${content.testIndication}\n` +
+          `${content.testIndication}\n` +
           "# 🖼️ Scan Dimension\n" +
-          `## ${content.selectedDimension}\n` +
+          `${content.selectedDimension}\n` +
           "---\n" +
           "# 📊 Model Output\n" +
           `${is2D 
-            ? `\n${formatMetrics(data.metrics)}\n\n# Prediction\n## ${data.tumor_type_predict}` 
-            : `**Predicted labels:** ## ${data.predicted_labels} | **Tumor volume:** ## ${data.tumor_volume} | **Tumor slices:** ## ${data.tumor_slices}`
+            ? `\n${formatMetrics(data.metrics)}\n\n# Prediction\n${data.tumor_type_predict}` 
+            : `**Predicted labels:** ${data.predicted_labels} | **Tumor volume:** ${data.tumor_volume} | **Tumor slices:** ## ${data.tumor_slices}`
           }`,
 
         // text: 
