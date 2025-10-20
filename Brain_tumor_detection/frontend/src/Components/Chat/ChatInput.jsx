@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import './chatinput.css'
+import { TiArrowUpThick } from "react-icons/ti";
 
 export default function ChatInput({ input, setInput, handleSend, isTyping, cancelTyping, disabled, chat }) {
   const textareaRef = useRef(null);
@@ -49,11 +50,9 @@ export default function ChatInput({ input, setInput, handleSend, isTyping, cance
             className="send-button" // Use the 'send-button' class from CSS
           >
             {isTyping ? (
-              // Icon for canceling AI response (e.g., a stop or cancel icon)
-              <i className="fas fa-stop-circle"></i> // Font Awesome stop icon
+              <span className="loading loading-dots loading-md"></span>
             ) : (
-              // Icon for sending (paper plane)
-              <i className="fas fa-paper-plane"></i> 
+              <TiArrowUpThick />
             )}
           </button>
       </div>

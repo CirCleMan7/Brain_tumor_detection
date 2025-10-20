@@ -7,6 +7,8 @@ import { v4 as uuidv4 } from "uuid";
 import "./App.css"
 import Introduction from "./Components/Introduction";
 import { useNavigate } from "react-router-dom";
+import ModalDelete from "./Components/Navbar/ModalDelete";
+import ModalInfo from "./Components/Navbar/ModalInfo"
 
 const formatMetrics = (metrics) => {
   if (!metrics) return "No metrics available.";
@@ -54,11 +56,30 @@ async function sendToFlowise(content) {
 export default function App() {
   const [chats, setChats] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showModalDelete, setShowModalDelete] = useState(false);
+  const [showModalInfo, setShowModalInfo] = useState(false);
+  const [interactChat, setInteractChat] = useState(null)
   const navigate = useNavigate();
   
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+  async function removeChat(chat) {
+
+    // 1. set id for delete
+    let id = chat.id
+
+    // 2. Delete all related image files
+    if (chat.content?.viewerImages?.length) {
+      for (const img of chat.content.viewerImages) {
+        await deleteFile(img); // assuming img.image is the URL
+      }
+    }
+
+    // 3. Remove the chat from state
+    setChats(prev => prev.filter(c => c.id !== id));
+  }  
   
   // Handler for creating new chat from modal submit
   async function createNewChat(topic, content) {
@@ -76,11 +97,16 @@ export default function App() {
       conversation: [
         {
           sender: "ai",
-          text: "🧠 Processing your data...",
+          text: `🧠 Processing your data...`,
+          process: true
         },
       ],
     };
+
     setChats((prev) => [...prev, newChat]);
+    console.log(chats)
+
+    await new Promise(r => setTimeout(r, 5000));
 
     // Step 2: Navigate to new chat page
     navigate(`/chat/${chatId}`);
@@ -110,13 +136,18 @@ export default function App() {
         method: "POST",
         body: formData,
       });
-
+      
+      console.log("create res")
+      newChat.conversation[0].process = false
       if (!res.ok) {
         const errText = await res.text();  // helpful for debugging
         throw new Error(`Backend error: ${res.status} - ${errText}`);
       }      
-      
+
+      console.log(chats)
+      console.log("test")
       const data = await res.json();
+      // const data = {"text" : "eiei"}
 
       const info = is2D ? `Tumor type from predict : ${data.tumor_type_predict} and testIndication ${content.testIndication}` : `predicted_labels : ${data.predicted_labels}, tumor_volume : ${data.tumor_volume}, tumor_slices : ${data.tumor_slices} and testIndication ${content.testIndication}`;
       
@@ -151,29 +182,55 @@ export default function App() {
 
       conversation.push({
         sender: "ai",
+        // text: 
+        //   "## 🧠 Brain Tumor Segmentation Report\n" +
+        //   "### 👨‍⚕️ Doctor\n" +
+        //   `**${content.doctorFirstName} ${content.doctorLastName}**\n` +
+        //   "### 👤 Patient\n" +
+        //   `**${content.patientFirstName} ${content.patientLastName}**\n` +
+        //   `🆔 Patient ID: \`${content.patientId}\`\n` +
+        //   "### 📅 Sample Collection Date\n" +
+        //   `\`${content.sampleCollectionDate}\`\n` +
+        //   "### 🔬 Test Indication\n" +
+        //   `\`${content.testIndication}\`\n` +
+        //   "### 🖼️ Scan Dimension\n" +
+        //   `\`${content.selectedDimension}\`\n` +
+        //   "---\n" +
+        //   "### 📊 Model Output\n" +
+        //   `${is2D 
+        //     ? `\`\`\`\n${formatMetrics(data.metrics)}\n\`\`\`\n### Prediction\n\`${data.tumor_type_predict}\`` 
+        //     : `**Predicted labels:** \`${data.predicted_labels}\` | **Tumor volume:** \`${data.tumor_volume}\` | **Tumor slices:** \`${data.tumor_slices}\``
+        //   }`,
+
         text: 
-          "## 🧠 Brain Tumor Segmentation Report\n" +
-          "### 👨‍⚕️ Doctor\n" +
-          `**${content.doctorFirstName} ${content.doctorLastName}**\n` +
-          "### 👤 Patient\n" +
-          `**${content.patientFirstName} ${content.patientLastName}**\n` +
-          `🆔 Patient ID: \`${content.patientId}\`\n` +
-          "### 📅 Sample Collection Date\n" +
-          `\`${content.sampleCollectionDate}\`\n` +
-          "### 🔬 Test Indication\n" +
-          `\`${content.testIndication}\`\n` +
-          "### 🖼️ Scan Dimension\n" +
-          `\`${content.selectedDimension}\`\n` +
-          "---\n" +
-          "### 📊 Model Output\n" +
-          `${is2D 
-            ? `\`\`\`\n${formatMetrics(data.metrics)}\n\`\`\`\n### Prediction\n\`${data.tumor_type_predict}\`` 
-            : `**Predicted labels:** \`${data.predicted_labels}\` | **Tumor volume:** \`${data.tumor_volume}\` | **Tumor slices:** \`${data.tumor_slices}\``
-          }`
+        `## 🧬 Brain Tumor Segmentation Report
+
+        ---
+
+        ### 👨‍⚕️ **Attending Physician**
+        Dr. ${content.doctorFirstName} ${content.doctorLastName}
+
+        ### 👤 **Patient Information**
+        **Name:** ${content.patientFirstName} ${content.patientLastName}  
+        **Patient ID:** ${content.patientId}
+
+        ### 📋 **Test Details**
+        **Sample Collection Date:** ${content.sampleCollectionDate}  
+        **Test Indication:** ${content.testIndication}  
+        **Scan Dimension:** ${content.selectedDimension}
+
+        ---
+
+        ### 📊 **Analysis Results**
+
+        ${is2D 
+          ? `**Metrics:**\n\`\`\`\n${formatMetrics(data.metrics)}\n\`\`\`\n\n**Prediction:** ${data.tumor_type_predict}` 
+          : `**Predicted Labels:** ${data.predicted_labels}  
+        **Tumor Volume:** ${data.tumor_volume}  
+        **Tumor Slices:** ${data.tumor_slices}`
+        }`,
       });
       
-      
-
       conversation.push({ sender: "ai", text: aiReply });
 
       // ✅ Update chat state with additional 3D image url (or 2D image previews)
@@ -231,11 +288,14 @@ export default function App() {
           setChats={setChats}
           showModal={showModal}
           setShowModal={setShowModal}
+          setShowModalDelete={setShowModalDelete}
+          setShowModalInfo={setShowModalInfo}
+          setInteractChat={setInteractChat}
         />
 
         <div style={{ marginLeft: "250px", padding: "20px", flex: 1, }}>
           <Routes>
-            <Route path="/chat/:id" element={<ChatPage chats={chats} setChats={setChats} showModal={showModal} />} />
+            <Route path="/chat/:id" element={<ChatPage chats={chats} setChats={setChats} />} />
             <Route path="/" element={<Introduction/>} />
           </Routes>
         </div>
@@ -249,6 +309,27 @@ export default function App() {
           onSubmit={(topic, content) => {
             setShowModal(false);
             createNewChat(topic, content);
+          }}
+        />
+      )}
+
+      {showModalDelete && (
+        <ModalDelete
+          interactChat={interactChat}
+          onClose={() => setShowModalDelete(false)}
+          onSubmit={(topic, content) => {
+            setShowModalDelete(false);
+            removeChat(interactChat)
+          }}
+        />
+      )}
+
+      {showModalInfo && (
+        <ModalInfo
+          interactChat={interactChat}
+          onClose={() => setShowModalInfo(false)}
+          onSubmit={(topic, content) => {
+            setShowModalInfo(false);
           }}
         />
       )}

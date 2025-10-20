@@ -7,7 +7,7 @@ import ChatInput from "./ChatInput";
 import PapayaViewerNew from "./../PapayaViewerNew"
 import Show2DImage from "./Show2DImage";
 
-export default function ChatPage({ chats, setChats}) {
+export default function ChatPage({ chats, setChats }) {
 
   const { id } = useParams();
   const chat = chats.find((c) => c.id === id);
@@ -38,13 +38,15 @@ export default function ChatPage({ chats, setChats}) {
     setAbortController(controller);
     
     try {
+      // await new Promise(r => setTimeout(r, 5000));
+
       const res = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/flowise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: userPrompt }),
         signal: abortController?.signal,
       });
-      
+
       if (!res.ok) throw new Error("Server error");
       
       const data = await res.json();
@@ -61,6 +63,7 @@ export default function ChatPage({ chats, setChats}) {
       }
     } finally {
       setAbortController(null); // clear it
+      chat.process = false
     }
   }
   
@@ -77,7 +80,7 @@ export default function ChatPage({ chats, setChats}) {
     const newMessages = [
       ...conversation,
       { sender: "user", text: trimmed },
-      { sender: "ai", text: "typing..." },
+      { sender: "ai", text: "typing...", process: true },
     ];
     setConversation(newMessages);
     setInput("");
@@ -280,7 +283,10 @@ export default function ChatPage({ chats, setChats}) {
                   </>
                 )}
                 <div className="bubble">
-                  <ReactMarkdown>{msg.text}</ReactMarkdown>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    {msg.process ? (<div className="fade-text text-gray-500"><ReactMarkdown>{msg.text}</ReactMarkdown></div>) : (<ReactMarkdown>{msg.text}</ReactMarkdown>)}
+                    {msg.process ? (<div className="loading loading-spinner loading-sm"></div>) : null}
+                  </div>
                 </div>
               </div>
             </div>

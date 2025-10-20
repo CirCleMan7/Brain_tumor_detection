@@ -1,32 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FaDownload } from "react-icons/fa6";
+import { IoInformationCircle } from "react-icons/io5";
 
-const ExportButton = ({ chat }) => {
-  const handleExport = () => {
-    const dataStr = JSON.stringify(chat, null, 2); // pretty print
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${chat.topic.replace(/\s+/g, "_") || "chat"}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    URL.revokeObjectURL(url);
-  };
+const ExportButton = ({ chat, setShowModalInfo, setInteractChat }) => {
 
   return (
     <StyledWrapper>
       <button className="action_has has_saved" aria-label="save" type="button" 
         onClick={(e) => {
-          e.preventDefault(); // prevent navigation if inside Link
-          e.stopPropagation(); // stop event bubbling (optional)
-          handleExport();
+          setInteractChat(chat)
+          setShowModalInfo(true)
         }}>
-      <FaDownload />
+      <IoInformationCircle />
       </button>
     </StyledWrapper>
   );

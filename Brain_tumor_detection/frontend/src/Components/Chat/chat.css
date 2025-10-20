@@ -255,3 +255,12 @@
 .chat-submit-button.cancel:hover {
   background-color: #c9302c;
 }
+
+@keyframes fadeText {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.fade-text {
+  animation: fadeText 1.5s ease-in-out infinite;
+}

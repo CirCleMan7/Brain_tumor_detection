@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import "./formStyle.css";
 import buttonStyles from "./FormButton.module.css";
+import InputFile2D from "./InputFile2D"
 
 export default function Modal({ onClose, onSubmit, chats }) {
   const [patientFirstName, setPatientFirstName] = useState("");
@@ -13,8 +14,13 @@ export default function Modal({ onClose, onSubmit, chats }) {
   const [selectedDimension, setSelectedDimension] = useState("2D");
   const [flairFiles, setFlairFiles] = useState([]);
   const [t1ceFiles, setT1ceFiles] = useState([]);
+  const [T1, setT1] = useState([]);
+  const [T2, setT2] = useState([]);
+
   const flairFileInputRef = useRef(null);
   const t1ceFileInputRef = useRef(null);
+  const T1InputRef = useRef(null);
+  const T2InputRef = useRef(null);
 
   const handleClickDimension = (value) => {
     if (value !== selectedDimension) {
@@ -25,12 +31,10 @@ export default function Modal({ onClose, onSubmit, chats }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const topic = `${patientFirstName} ${patientLastName}`;
-    if (chats.some(chat => chat.topic?.trim().toLowerCase() === topic?.trim().toLowerCase())) {
-      alert("Topic already exists. Please choose another.");
-      return;
-    }
+    
     const content = {
+      patientFirstName,
+      patientLastName,
       doctorFirstName,
       doctorLastName,
       patientId,
@@ -40,6 +44,13 @@ export default function Modal({ onClose, onSubmit, chats }) {
       flairFiles,
       t1ceFiles,
     };
+
+    const topic = `${content.patientFirstName} ${content.patientLastName}`;
+    if (chats.some(chat => chat.topic?.trim().toLowerCase() === topic?.trim().toLowerCase())) {
+      alert("Topic already exists. Please choose another.");
+      return;
+    }
+
     onSubmit(topic, content);
   };
 
@@ -67,15 +78,7 @@ export default function Modal({ onClose, onSubmit, chats }) {
     setFlairFiles(unique);
     event.target.value = null;
   };
-
-  const handleResetFiles = () => {
-    if (flairFileInputRef.current) flairFileInputRef.current.value = null;
-    if (t1ceFileInputRef.current) t1ceFileInputRef.current.value = null;
-
-    setFlairFiles([]);
-    setT1ceFiles([]);
-  };
-
+  
   const handleT1ceFileChange = (event) => {
     const newFiles = Array.from(event.target.files);
   
@@ -97,6 +100,14 @@ export default function Modal({ onClose, onSubmit, chats }) {
     setT1ceFiles(unique);
     event.target.value = null;
   };
+
+  const handleResetFiles = () => {
+    if (flairFileInputRef.current) flairFileInputRef.current.value = null;
+    if (t1ceFileInputRef.current) t1ceFileInputRef.current.value = null;
+
+    setFlairFiles([]);
+    setT1ceFiles([]);
+  };
   
   const getFileIcon = (fileName) => {
     const lower = fileName.toLowerCase();
@@ -105,6 +116,293 @@ export default function Modal({ onClose, onSubmit, chats }) {
     if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png")) return "🖼️";
     return "📁";
   };
+
+  let inputFileMode
+  let contentInputFileMode
+
+  switch (inputFileMode) {
+    case '2D':
+      contentInputFileMode = 
+        <>
+            {/* Brain Image Upload */}
+            <div className="form-row">
+              <div className="file-upload-section">
+                <div className="file-upload-header">
+                  <h3>2D Brain Image (.png, .jpg, .npy, .nii, .nii.gz):</h3>
+                  <button type="button" onClick={handleFlairClick} className={buttonStyles["add-file-button"]}>Upload Image</button>
+                </div>
+                <input 
+                  type="file" 
+                  ref={flairFileInputRef} 
+                  onChange={handleFlairFileChange} 
+                  accept=".png,.jpg,.jpeg,.npy,.nii,.nii.gz"
+                  style={{ display: "none" }} 
+                />
+                <div className="file-list">
+                  {flairFiles.map((file, index) => (
+                    <div key={index} className="file-item">
+                      <span>{getFileIcon(file.name)}</span>
+                      <span className="file-name">{file.name}</span>
+                      <button type="button" onClick={() => handleRemoveFlairFile(index)} className="remove-file-btn">✖</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {/* <InputFile2D handleFlairClick={handleFlairClick} flairFileInputRef={flairFileInputRef} 
+            handleFlairFileChange={handleFlairFileChange} getFileIcon={getFileIcon}
+              flairFiles={flairFiles} t1ceFiles={t1ceFiles} /> */}
+
+            {/* Mask Image Upload */}
+            <div className="form-row">
+              <div className="file-upload-section">
+                <div className="file-upload-header">
+                  <h3>Mask Image (same formats):</h3>
+                  <button type="button" onClick={handleT1ceClick} className={buttonStyles["add-file-button"]}>Upload Mask</button>
+                </div>
+                <input 
+                  type="file" 
+                  ref={t1ceFileInputRef} 
+                  onChange={handleT1ceFileChange} 
+                  accept=".png,.jpg,.jpeg,.npy,.nii,.nii.gz"
+                  style={{ display: "none" }} 
+                />
+                <div className="file-list">
+                  {t1ceFiles.map((file, index) => (
+                    <div key={index} className="file-item">
+                      <span>{getFileIcon(file.name)}</span>
+                      <span className="file-name">{file.name}</span>
+                      <button type="button" onClick={() => handleRemoveT1ceFile(index)} className="remove-file-btn">✖</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
+      break;
+    case '3D':
+      contentInputFileMode = 
+        <>
+          {/* FLAIR Upload for 3D */}
+          <div className="form-row">
+            <div className="file-upload-section">
+              <div className="file-upload-header">
+                <h3>FLAIR Scan (.nii or .nii.gz):</h3>
+                <button type="button" onClick={handleFlairClick} className={buttonStyles["add-file-button"]}>Upload FLAIR</button>
+              </div>
+              <input 
+                type="file" 
+                ref={flairFileInputRef} 
+                onChange={handleFlairFileChange} 
+                accept=".nii,.nii.gz"
+                style={{ display: "none" }} 
+              />
+              <div className="file-list">
+                {flairFiles.map((file, index) => (
+                  <div key={index} className="file-item">
+                    <span>{getFileIcon(file.name)}</span>
+                    <span className="file-name">{file.name}</span>
+                    <button type="button" onClick={() => handleRemoveFlairFile(index)} className="remove-file-btn">✖</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* T1CE Upload for 3D */}
+          <div className="form-row">
+            <div className="file-upload-section">
+              <div className="file-upload-header">
+                <h3>T1CE Scan (.nii or .nii.gz):</h3>
+                <button type="button" onClick={handleT1ceClick} className={buttonStyles["add-file-button"]}>Upload T1CE</button>
+              </div>
+              <input 
+                type="file" 
+                ref={t1ceFileInputRef} 
+                onChange={handleT1ceFileChange} 
+                accept=".nii,.nii.gz"
+                style={{ display: "none" }} 
+              />
+              <div className="file-list">
+                {t1ceFiles.map((file, index) => (
+                  <div key={index} className="file-item">
+                    <span>{getFileIcon(file.name)}</span>
+                    <span className="file-name">{file.name}</span>
+                    <button type="button" onClick={() => handleRemoveT1ceFile(index)} className="remove-file-btn">✖</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      break;
+    case '3D_extra':
+      contentInputFileMode = 
+        <>
+          { /* T1 input file */}
+          <div className="form-row">
+            <div className="file-upload-section">
+              <div className="file-upload-header">
+                <h3>FLAIR Scan (.nii or .nii.gz):</h3>
+                <button type="button" onClick={handleFlairClick} className={buttonStyles["add-file-button"]}>Upload FLAIR</button>
+              </div>
+              <input 
+                type="file" 
+                ref={flairFileInputRef} 
+                onChange={handleFlairFileChange} 
+                accept=".nii,.nii.gz"
+                style={{ display: "none" }} 
+              />
+              <div className="file-list">
+                {flairFiles.map((file, index) => (
+                  <div key={index} className="file-item">
+                    <span>{getFileIcon(file.name)}</span>
+                    <span className="file-name">{file.name}</span>
+                    <button type="button" onClick={() => handleRemoveFlairFile(index)} className="remove-file-btn">✖</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          { /* T2 input file */}
+          <div className="form-row">
+            <div className="file-upload-section">
+              <div className="file-upload-header">
+                <h3>FLAIR Scan (.nii or .nii.gz):</h3>
+                <button type="button" onClick={handleFlairClick} className={buttonStyles["add-file-button"]}>Upload FLAIR</button>
+              </div>
+              <input 
+                type="file" 
+                ref={flairFileInputRef} 
+                onChange={handleFlairFileChange} 
+                accept=".nii,.nii.gz"
+                style={{ display: "none" }} 
+              />
+              <div className="file-list">
+                {flairFiles.map((file, index) => (
+                  <div key={index} className="file-item">
+                    <span>{getFileIcon(file.name)}</span>
+                    <span className="file-name">{file.name}</span>
+                    <button type="button" onClick={() => handleRemoveFlairFile(index)} className="remove-file-btn">✖</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* FLAIR Upload for 3D Extra */}
+          <div className="form-row">
+            <div className="file-upload-section">
+              <div className="file-upload-header">
+                <h3>FLAIR Scan (.nii or .nii.gz):</h3>
+                <button type="button" onClick={handleFlairClick} className={buttonStyles["add-file-button"]}>Upload FLAIR</button>
+              </div>
+              <input 
+                type="file" 
+                ref={flairFileInputRef} 
+                onChange={handleFlairFileChange} 
+                accept=".nii,.nii.gz"
+                style={{ display: "none" }} 
+              />
+              <div className="file-list">
+                {flairFiles.map((file, index) => (
+                  <div key={index} className="file-item">
+                    <span>{getFileIcon(file.name)}</span>
+                    <span className="file-name">{file.name}</span>
+                    <button type="button" onClick={() => handleRemoveFlairFile(index)} className="remove-file-btn">✖</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* T1CE Upload for 3D */}
+          <div className="form-row">
+            <div className="file-upload-section">
+              <div className="file-upload-header">
+                <h3>T1CE Scan (.nii or .nii.gz):</h3>
+                <button type="button" onClick={handleT1ceClick} className={buttonStyles["add-file-button"]}>Upload T1CE</button>
+              </div>
+              <input 
+                type="file" 
+                ref={t1ceFileInputRef} 
+                onChange={handleT1ceFileChange} 
+                accept=".nii,.nii.gz"
+                style={{ display: "none" }} 
+              />
+              <div className="file-list">
+                {t1ceFiles.map((file, index) => (
+                  <div key={index} className="file-item">
+                    <span>{getFileIcon(file.name)}</span>
+                    <span className="file-name">{file.name}</span>
+                    <button type="button" onClick={() => handleRemoveT1ceFile(index)} className="remove-file-btn">✖</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      break;
+    default:
+      contentInputFileMode = 
+        <>
+          {/* Brain Image Upload */}
+          <div className="form-row">
+            <div className="file-upload-section">
+              <div className="file-upload-header">
+                <h3>2D Brain Image (.png, .jpg, .npy, .nii, .nii.gz):</h3>
+                <button type="button" onClick={handleFlairClick} className={buttonStyles["add-file-button"]}>Upload Image</button>
+              </div>
+              <input 
+                type="file" 
+                ref={flairFileInputRef} 
+                onChange={handleFlairFileChange} 
+                accept=".png,.jpg,.jpeg,.npy,.nii,.nii.gz"
+                style={{ display: "none" }} 
+              />
+              <div className="file-list">
+                {flairFiles.map((file, index) => (
+                  <div key={index} className="file-item">
+                    <span>{getFileIcon(file.name)}</span>
+                    <span className="file-name">{file.name}</span>
+                    <button type="button" onClick={() => handleRemoveFlairFile(index)} className="remove-file-btn">✖</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* <InputFile2D handleFlairClick={handleFlairClick} flairFileInputRef={flairFileInputRef} 
+          handleFlairFileChange={handleFlairFileChange} getFileIcon={getFileIcon}
+            flairFiles={flairFiles} t1ceFiles={t1ceFiles} /> */}
+
+          {/* Mask Image Upload */}
+          <div className="form-row">
+            <div className="file-upload-section">
+              <div className="file-upload-header">
+                <h3>Mask Image (same formats):</h3>
+                <button type="button" onClick={handleT1ceClick} className={buttonStyles["add-file-button"]}>Upload Mask</button>
+              </div>
+              <input 
+                type="file" 
+                ref={t1ceFileInputRef} 
+                onChange={handleT1ceFileChange} 
+                accept=".png,.jpg,.jpeg,.npy,.nii,.nii.gz"
+                style={{ display: "none" }} 
+              />
+              <div className="file-list">
+                {t1ceFiles.map((file, index) => (
+                  <div key={index} className="file-item">
+                    <span>{getFileIcon(file.name)}</span>
+                    <span className="file-name">{file.name}</span>
+                    <button type="button" onClick={() => handleRemoveT1ceFile(index)} className="remove-file-btn">✖</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+  }
   
 
   const handleRemoveFlairFile = (index) => {
@@ -160,12 +458,8 @@ export default function Modal({ onClose, onSubmit, chats }) {
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="input-data textarea">
-              <textarea value={testIndication} style={{ width: "100%", height: "120px" }} onChange={(e) => setTestIndication(e.target.value)} required />
-              <div className="underline"></div>
-              <label>Diagnostic indication</label>
-            </div>
+          <div className="form-row" style={{display: "flex", justifyContent: "center"}}>
+            <textarea value={testIndication} className="textarea w-160" placeholder="Diagnostic indication" style={{ marginTop:'10px'}} onChange={(e) => setTestIndication(e.target.value)} required />
           </div>
 
           <div className="form-row">

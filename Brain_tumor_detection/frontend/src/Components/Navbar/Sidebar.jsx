@@ -3,8 +3,9 @@ import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ButtonStyles from "./navbarButton.module.css"
 import ExportButton from "./ExportButton";
+import InfoButton from "./InfoButton"
 
-export default function Sidebar({ chats, setChats, setShowModal }) {
+export default function Sidebar({ chats, setChats, setShowModal, setShowModalDelete, setShowModalInfo, setInteractChat }) {
   const location = useLocation();
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
@@ -35,25 +36,25 @@ export default function Sidebar({ chats, setChats, setShowModal }) {
   }
   
 
-  async function removeChat(id) {
-    // 1. Find the chat with the given id
-    const chat = chats.find(c => c.id === id);
+  // async function removeChat(id) {
+  //   // 1. Find the chat with the given id
+  //   const chat = chats.find(c => c.id === id);
   
-    if (!chat) {
-      console.warn(`Chat with id ${id} not found.`);
-      return;
-    }
+  //   if (!chat) {
+  //     console.warn(`Chat with id ${id} not found.`);
+  //     return;
+  //   }
   
-    // 2. Delete all related image files
-    if (chat.content?.viewerImages?.length) {
-      for (const img of chat.content.viewerImages) {
-        await deleteFile(img); // assuming img.image is the URL
-      }
-    }
+  //   // 2. Delete all related image files
+  //   if (chat.content?.viewerImages?.length) {
+  //     for (const img of chat.content.viewerImages) {
+  //       await deleteFile(img); // assuming img.image is the URL
+  //     }
+  //   }
   
-    // 3. Remove the chat from state
-    setChats(prev => prev.filter(c => c.id !== id));
-  }  
+  //   // 3. Remove the chat from state
+  //   setChats(prev => prev.filter(c => c.id !== id));
+  // }  
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -140,7 +141,8 @@ export default function Sidebar({ chats, setChats, setShowModal }) {
               >
                 <Link className={ButtonStyles["chat-link"]} to={`/chat/${chat.id}`}>
                   <div className={ButtonStyles["chat-content"]}>
-                    <ExportButton chat={chat} />
+                    {/* <ExportButton chat={chat} /> */}
+                    <InfoButton chat={chat} setShowModalInfo={setShowModalInfo} setInteractChat={setInteractChat} />
                     
                     <div className={ButtonStyles["chat-info"]}>
                       <div className={ButtonStyles["chat-topic"]} title={chat.topic}>
@@ -154,9 +156,10 @@ export default function Sidebar({ chats, setChats, setShowModal }) {
                     <button 
                       className={ButtonStyles["close-button"]} 
                       onClick={(e) => {
+                        setInteractChat(chat)
+                        setShowModalDelete(true)
                         e.preventDefault();
                         e.stopPropagation();
-                        removeChat(chat.id);
                       }}
                       title="Remove case"
                     >
