@@ -41,6 +41,7 @@ export default function ChatPage({ chats, setChats }) {
       // await new Promise(r => setTimeout(r, 5000));
 
       const res = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/flowise", {
+      // const res = await fetch("https://localhost:8000/flowise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: userPrompt }),
@@ -251,7 +252,7 @@ export default function ChatPage({ chats, setChats }) {
             <>
               <div>
                 <h1>Brain Tumor Segmentation</h1>
-                <button onClick={loadExampleImages}>Predict & Show</button>
+                <button className="btn" onClick={loadExampleImages}>Predict & Show</button>
                 <PapayaViewerNew viewerParams={viewerParams} />
               </div>
               <div onClick={handleCloseViewer}>

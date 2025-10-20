@@ -33,6 +33,7 @@ async function sendToFlowise(content) {
     };
 
     const flowiseRes = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/flowise", {
+    // const flowiseRes = await fetch("https://localhost:8000/flowise", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestBody),
@@ -133,6 +134,7 @@ export default function App() {
       }
 
       const res = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/submit_case", {
+      // const res = await fetch("https://localhost:8000/submit_case", {
         method: "POST",
         body: formData,
       });
@@ -153,6 +155,7 @@ export default function App() {
       
 
       const viewerImages = data.image_urls;
+      console.log("image :", viewerImages)
       const basePrompt = `Please describe what is ${info} and suggested for treatment based on providing guidance.`;
 
       const flowiseData = await sendToFlowise(basePrompt);
@@ -194,11 +197,11 @@ export default function App() {
           "# 🔬 Test Indication\n" +
           `## ${content.testIndication}\n` +
           "# 🖼️ Scan Dimension\n" +
-          `##${content.selectedDimension}\n` +
+          `## ${content.selectedDimension}\n` +
           "---\n" +
           "# 📊 Model Output\n" +
           `${is2D 
-            ? `\n${formatMetrics(data.metrics)}\n\n# Prediction\n\`${data.tumor_type_predict}\`` 
+            ? `\n${formatMetrics(data.metrics)}\n\n# Prediction\n## ${data.tumor_type_predict}` 
             : `**Predicted labels:** ## ${data.predicted_labels} | **Tumor volume:** ## ${data.tumor_volume} | **Tumor slices:** ## ${data.tumor_slices}`
           }`,
 
