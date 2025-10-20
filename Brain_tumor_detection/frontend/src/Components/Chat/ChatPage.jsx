@@ -283,10 +283,10 @@ export default function ChatPage({ chats, setChats }) {
                   </>
                 )}
                 <div className="bubble">
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  {/* <div style={{ display: "flex", alignItems: "center", gap: "8px" }}> */}
                     {msg.process ? (<div className="fade-text text-gray-500"><ReactMarkdown>{msg.text}</ReactMarkdown></div>) : (<ReactMarkdown>{msg.text}</ReactMarkdown>)}
                     {msg.process ? (<div className="loading loading-spinner loading-sm"></div>) : null}
-                  </div>
+                  {/* </div> */}
                 </div>
               </div>
             </div>
