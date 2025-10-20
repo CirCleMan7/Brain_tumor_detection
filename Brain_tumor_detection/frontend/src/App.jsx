@@ -71,11 +71,11 @@ export default function App() {
     let id = chat.id
 
     // 2. Delete all related image files
-    if (chat.content?.viewerImages?.length) {
-      for (const img of chat.content.viewerImages) {
-        await deleteFile(img); // assuming img.image is the URL
-      }
-    }
+    // if (chat.content?.viewerImages?.length) {
+    //   for (const img of chat.content.viewerImages) {
+    //     await deleteFile(img); // assuming img.image is the URL
+    //   }
+    // }
 
     // 3. Remove the chat from state
     setChats(prev => prev.filter(c => c.id !== id));
@@ -183,23 +183,23 @@ export default function App() {
       conversation.push({
         sender: "ai",
         text: 
-          "## 🧠 Brain Tumor Segmentation Report\n" +
-          "### 👨‍⚕️ Doctor\n" +
-          `**${content.doctorFirstName} ${content.doctorLastName}**\n` +
-          "### 👤 Patient\n" +
-          `**${content.patientFirstName} ${content.patientLastName}**\n` +
+          "# 🧠 Brain Tumor Segmentation Report\n" +
+          "# 👨‍⚕️ Doctor\n" +
+          `## ${content.doctorFirstName} ${content.doctorLastName}\n` +
+          "# 👤 Patient\n" +
+          `## ${content.patientFirstName} ${content.patientLastName}\n` +
           `🆔 Patient ID: \`${content.patientId}\`\n` +
-          "### 📅 Sample Collection Date\n" +
-          `\`${content.sampleCollectionDate}\`\n` +
-          "### 🔬 Test Indication\n" +
-          `\`${content.testIndication}\`\n` +
-          "### 🖼️ Scan Dimension\n" +
-          `\`${content.selectedDimension}\`\n` +
+          "# 📅 Sample Collection Date\n" +
+          `## ${content.sampleCollectionDate}\n` +
+          "# 🔬 Test Indication\n" +
+          `## ${content.testIndication}\n` +
+          "# 🖼️ Scan Dimension\n" +
+          `##${content.selectedDimension}\n` +
           "---\n" +
-          "### 📊 Model Output\n" +
+          "# 📊 Model Output\n" +
           `${is2D 
-            ? `\`\`\`\n${formatMetrics(data.metrics)}\n\`\`\`\n### Prediction\n\`${data.tumor_type_predict}\`` 
-            : `**Predicted labels:** \`${data.predicted_labels}\` | **Tumor volume:** \`${data.tumor_volume}\` | **Tumor slices:** \`${data.tumor_slices}\``
+            ? `\n${formatMetrics(data.metrics)}\n\n# Prediction\n\`${data.tumor_type_predict}\`` 
+            : `**Predicted labels:** ## ${data.predicted_labels} | **Tumor volume:** ## ${data.tumor_volume} | **Tumor slices:** ## ${data.tumor_slices}`
           }`,
 
         // text: 
