@@ -201,6 +201,35 @@ export default function App() {
             ? `\`\`\`\n${formatMetrics(data.metrics)}\n\`\`\`\n### Prediction\n\`${data.tumor_type_predict}\`` 
             : `**Predicted labels:** \`${data.predicted_labels}\` | **Tumor volume:** \`${data.tumor_volume}\` | **Tumor slices:** \`${data.tumor_slices}\``
           }`,
+
+        // text: 
+        // `## 🧬 Brain Tumor Segmentation Report
+
+        // ---
+
+        // ### 👨‍⚕️ **Attending Physician**
+        // Dr. ${content.doctorFirstName} ${content.doctorLastName}
+
+        // ### 👤 **Patient Information**
+        // **Name:** ${content.patientFirstName} ${content.patientLastName}  
+        // **Patient ID:** ${content.patientId}
+
+        // ### 📋 **Test Details**
+        // **Sample Collection Date:** ${content.sampleCollectionDate}  
+        // **Test Indication:** ${content.testIndication}  
+        // **Scan Dimension:** ${content.selectedDimension}
+
+        // ---
+
+        // ### 📊 **Analysis Results**
+
+        // ${is2D 
+        //   ? `**Metrics:**\n\`\`\`\n${formatMetrics(data.metrics)}\n\`\`\`\n\n**Prediction:** ${data.tumor_type_predict}` 
+        //   : `**Predicted Labels:** ${data.predicted_labels}  
+        // **Tumor Volume:** ${data.tumor_volume}  
+        // **Tumor Slices:** ${data.tumor_slices}`
+        // }`,
+      });
       
       conversation.push({ sender: "ai", text: aiReply });
 
