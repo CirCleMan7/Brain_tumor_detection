@@ -35,6 +35,7 @@ async function sendToFlowise(content) {
 
     // const flowiseRes = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/flowise", {
     const flowiseRes = await fetch("http://localhost:9000/flowise", {
+    // const flowiseRes = await fetch("https://nadene-spaviet-camie.ngrok-free.dev", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestBody),
@@ -134,8 +135,9 @@ export default function App() {
         formData.append("t1ceFiles", content.t1ceFiles[0]);
       }
 
-      const res = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/submit_case", {
+      // const res = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/submit_case", {
       // const res = await fetch("http://localhost:9000/submit_case", {
+      const res = await fetch("https://nadene-spaviet-camie.ngrok-free.dev/submit_case", {
         method: "POST",
         body: formData,
       });
@@ -208,6 +210,8 @@ export default function App() {
       });
       
       conversation.push({ sender: "ai", text: aiReply });
+
+      console.log(viewerImages)
 
       // ✅ Update chat state with additional 3D image url (or 2D image previews)
       setChats((prevChats) =>
