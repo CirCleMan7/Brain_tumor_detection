@@ -1,10 +1,9 @@
 .chat-page {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   height: 90vh;
   width: 100%;
-  max-width: 100%;
 }
 
 .chat-page.row-layout {
@@ -36,7 +35,7 @@
 
 .viewer-wrapper {
   width: 100%;
-  height: 100vh;           /* full screen height */
+  height: 100vh; /* full screen height */
   min-height: 600px;
   position: relative;
   background-color: #fff;
@@ -48,7 +47,7 @@
 .papaya {
   width: 50%;
   height: 100%;
-  min-height: 500px;       /* prevent it from collapsing */
+  min-height: 500px; /* prevent it from collapsing */
   min-width: 500px;
 }
 
@@ -118,7 +117,8 @@
   border: 1px solid rgba(0, 0, 0, 0.06);
   line-height: 1.6;
   font-size: 15px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
   color: #374151;
   transition: all 0.2s ease;
 }
@@ -129,8 +129,14 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .bubble-3d {
@@ -171,13 +177,19 @@
   margin-bottom: 0;
 }
 
-.bubble h1, .bubble h2, .bubble h3, .bubble h4, .bubble h5, .bubble h6 {
+.bubble h1,
+.bubble h2,
+.bubble h3,
+.bubble h4,
+.bubble h5,
+.bubble h6 {
   margin: 0 0 12px 0;
   font-weight: 600;
   color: inherit;
 }
 
-.bubble ul, .bubble ol {
+.bubble ul,
+.bubble ol {
   margin: 8px 0;
   padding-left: 20px;
 }
@@ -191,7 +203,8 @@
   background-color: rgba(0, 0, 0, 0.08);
   padding: 2px 6px;
   border-radius: 4px;
-  font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
   font-size: 13px;
 }
 
@@ -245,7 +258,7 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: background-color 0.3s;
 }
 
@@ -262,8 +275,13 @@
 }
 
 @keyframes fadeText {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .fade-text {
