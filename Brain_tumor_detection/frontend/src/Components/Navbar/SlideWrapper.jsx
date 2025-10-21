@@ -18,30 +18,31 @@ const SlideWrapper = ({ children }) => {
       >
         {children}
       </div>
-      <MdOutlineKeyboardArrowLeft
+      {/* <MdOutlineKeyboardArrowLeft
         size={60}
         className={[
           'text-gray-500 hover:text-black hover:scale-120 transition-transform duration-200 cursor-pointer',
           open ? '-translate-x-[60px]' : 'rotate-180 ',
         ].join(' ')}
         onClick={handleToggle}
-      />
-      {/* <div
+      /> */}
+      <div
         className={[
-          'bg-black w-[60px] h-full z-0 flex items-center',
-          'transition-transform duration-500 ease-in-out',
+          'bg-black w-[30px] h-full z-0 flex items-center cursor-pointer',
+          'transition-transform duration-500 ease-in-out ',
           open ? '' : 'translate-x-[0px]',
         ].join(' ')}
+        onClick={handleToggle}
       >
         <MdOutlineKeyboardArrowLeft
           size={60}
           className={[
-            'z-10 text-gray-500 hover:text-black hover:scale-120 transition-transform duration-200 cursor-pointer',
+            'z-10 text-gray-500 hover:text-black hover:scale-120 transition-transform duration-200 ',
             open ? '' : 'rotate-180 ',
+            'hover:text-gray-300',
           ].join(' ')}
-          onClick={handleToggle}
         />
-      </div> */}
+      </div>
     </div>
   )
 }
