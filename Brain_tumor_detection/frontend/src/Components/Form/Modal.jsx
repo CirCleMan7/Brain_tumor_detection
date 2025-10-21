@@ -46,8 +46,8 @@ export default function Modal({ onClose, onSubmit, chats }) {
     };
 
     const topic = `${content.patientFirstName} ${content.patientLastName}`;
-    if (chats.some(chat => chat.topic?.trim().toLowerCase() === topic?.trim().toLowerCase())) {
-      alert("Topic already exists. Please choose another.");
+    if (chats.some(chat => chat.content?.patientId?.trim().toLowerCase() === patientId?.trim().toLowerCase())) {
+      alert("Patient ID already exists. Please choose another.");
       return;
     }
 

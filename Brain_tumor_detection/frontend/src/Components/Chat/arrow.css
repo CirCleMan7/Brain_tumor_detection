@@ -12,7 +12,7 @@
     position: absolute;
     width: 5px;
     height: 19px;
-    background-color: #020202;
+    background-color: rgb(0, 7, 44);
     border-radius: 2px;
     transition: 0.3s ease;
   }

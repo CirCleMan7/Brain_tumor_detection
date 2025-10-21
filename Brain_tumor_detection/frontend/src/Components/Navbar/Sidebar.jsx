@@ -146,7 +146,7 @@ export default function Sidebar({ chats, setChats, setShowModal, setShowModalDel
                     
                     <div className={ButtonStyles["chat-info"]}>
                       <div className={ButtonStyles["chat-topic"]} title={chat.topic}>
-                        {chat.topic}
+                        {chat.content.patientId}
                       </div>
                       <div className={ButtonStyles["chat-details"]}>
                         {chat.content.selectedDimension} • Case

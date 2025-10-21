@@ -13,8 +13,13 @@
 
 /* Left side: Viewer */
 .viewer-container {
-  width: 80%;
+  width: 100%;
   height: 100vh;
+  /* background: rgb(5, 0, 27); */
+  /* background: #110093; */
+  background: gainsboro;
+  /* border: #3b82f6; */
+
   /* background: #fafafa; */
   display: flex;
   align-items: center;

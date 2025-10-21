@@ -32,8 +32,8 @@ async function sendToFlowise(content) {
       question: content,
     };
 
-    const flowiseRes = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/flowise", {
-    // const flowiseRes = await fetch("https://localhost:8000/flowise", {
+    // const flowiseRes = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/flowise", {
+    const flowiseRes = await fetch("http://localhost:9000/flowise", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestBody),
@@ -133,8 +133,8 @@ export default function App() {
         formData.append("t1ceFiles", content.t1ceFiles[0]);
       }
 
-      const res = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/submit_case", {
-      // const res = await fetch("https://localhost:8000/submit_case", {
+      // const res = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/submit_case", {
+      const res = await fetch("http://localhost:9000/submit_case", {
         method: "POST",
         body: formData,
       });
@@ -158,10 +158,10 @@ export default function App() {
       console.log("image :", viewerImages)
       const basePrompt = `Please describe what is ${info} and suggested for treatment based on providing guidance.`;
 
-      const flowiseData = await sendToFlowise(basePrompt);
+      // const flowiseData = await sendToFlowise(basePrompt);
       console.log("flowise content");
-      const aiReply = flowiseData.reply?.text || "❌ Failed to connect AI.";
-      console.log(flowiseData)
+      // const aiReply = flowiseData.reply?.text || "❌ Failed to connect AI.";
+      const aiReply = "❌ Failed to connect AI.";
       
       let conversation = [{ sender: "ai", text: "✅ Case processed successfully." }];
       
@@ -187,51 +187,23 @@ export default function App() {
         sender: "ai",
         text: 
           "# 🧠 Brain Tumor Segmentation Report\n" +
-          "# 👨‍⚕️ Doctor\n" +
-          `${content.doctorFirstName} ${content.doctorLastName}\n` +
-          "# 👤 Patient\n" +
+          "**👨‍⚕️ Doctor**\n" +
+          `Dr.${content.doctorFirstName} ${content.doctorLastName}\n\n` +
+          "**👤 Patient**\n" +
           `${content.patientFirstName} ${content.patientLastName}\n` +
-          `🆔 Patient ID: ${content.patientId}\n` +
-          "# 📅 Sample Collection Date\n" +
-          `${content.sampleCollectionDate}\n` +
-          "# 🔬 Test Indication\n" +
-          `${content.testIndication}\n` +
-          "# 🖼️ Scan Dimension\n" +
-          `${content.selectedDimension}\n` +
+          `**🆔 Patient ID**: ${content.patientId}\n\n` +
+          "**📅 Sample Collection Date**\n" +
+          `${content.sampleCollectionDate}\n\n` +
+          "**🔬 Test Indication**\n" +
+          `${content.testIndication}\n\n` +
+          "**🖼️ Scan Dimension**\n" +
+          `${content.selectedDimension}\n\n` +
           "---\n" +
-          "# 📊 Model Output\n" +
+          "**📊 Model Output**\n" +
           `${is2D 
-            ? `\n${formatMetrics(data.metrics)}\n\n# Prediction\n${data.tumor_type_predict}` 
+            ? `\n${formatMetrics(data.metrics)}\n\n### Prediction\n${data.tumor_type_predict}` 
             : `**Predicted labels:** ${data.predicted_labels} | **Tumor volume:** ${data.tumor_volume} | **Tumor slices:** ## ${data.tumor_slices}`
           }`,
-
-        // text: 
-        // `## 🧬 Brain Tumor Segmentation Report
-
-        // ---
-
-        // ### 👨‍⚕️ **Attending Physician**
-        // Dr. ${content.doctorFirstName} ${content.doctorLastName}
-
-        // ### 👤 **Patient Information**
-        // **Name:** ${content.patientFirstName} ${content.patientLastName}  
-        // **Patient ID:** ${content.patientId}
-
-        // ### 📋 **Test Details**
-        // **Sample Collection Date:** ${content.sampleCollectionDate}  
-        // **Test Indication:** ${content.testIndication}  
-        // **Scan Dimension:** ${content.selectedDimension}
-
-        // ---
-
-        // ### 📊 **Analysis Results**
-
-        // ${is2D 
-        //   ? `**Metrics:**\n\`\`\`\n${formatMetrics(data.metrics)}\n\`\`\`\n\n**Prediction:** ${data.tumor_type_predict}` 
-        //   : `**Predicted Labels:** ${data.predicted_labels}  
-        // **Tumor Volume:** ${data.tumor_volume}  
-        // **Tumor Slices:** ${data.tumor_slices}`
-        // }`,
       });
       
       conversation.push({ sender: "ai", text: aiReply });
@@ -296,7 +268,7 @@ export default function App() {
           setInteractChat={setInteractChat}
         />
 
-        <div style={{ marginLeft: "250px", padding: "20px", flex: 1, }}>
+        <div style={{ marginLeft: "200px", padding: "20px", flex: 1, }}>
           <Routes>
             <Route path="/chat/:id" element={<ChatPage chats={chats} setChats={setChats} />} />
             <Route path="/" element={<Introduction/>} />

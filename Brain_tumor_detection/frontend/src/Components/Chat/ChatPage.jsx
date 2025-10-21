@@ -191,14 +191,13 @@ export default function ChatPage({ chats, setChats }) {
       left: "-30px",
       top: "40%",
       cursor: "pointer",
-      zIndex: 998,
+      zIndex: 30,
     },
     imageNavArrow: {
       cursor: "pointer",
       fontSize: "24px",
       padding: "0 12px",
       userSelect: "none",
-      color: "#333",
     },
     imageNavContainer: {
       display: "flex",
@@ -234,7 +233,7 @@ export default function ChatPage({ chats, setChats }) {
   
       {/* Left: Viewer */}
       {showImage && (
-        <div className="viewer-container" style={{ width: 800 /* fix width for viewer */ }}>
+        <div className="viewer-container" style={{ width: 800,/* fix width for viewer */ }}>
           {chat?.content?.selectedDimension === "2D" ? (
             <Show2DImage
               key={chat.id}
@@ -264,13 +263,35 @@ export default function ChatPage({ chats, setChats }) {
       )}
   
       {/* Right: Chat Section */}
-      <div className="chat-container" style={{ flexGrow: 1, marginLeft: 20 }}>
+      <div className="chat-container" style={{ flexGrow: 1, marginLeft: 5 }}>
         {!showImage && (chat?.content?.viewerImages?.length > 0 || chat.content.selectedDimension === "3D") && (
+          // <div
+          //   style={styles.toggleButton}
+          //   className="arrow right"
+          //   onClick={handleOpenViewer}
+          // />
+
           <div
             style={styles.toggleButton}
             className="arrow right"
             onClick={handleOpenViewer}
           />
+          // <div
+          //   onClick={handleCloseViewer}
+          //   style={{
+          //     width: '40px',
+          //     height: '100%',
+          //     backgroundColor: '#374151',
+          //     display: 'flex',
+          //     alignItems: 'center',
+          //     justifyContent: 'center',
+          //     cursor: 'pointer',
+          //     transition: 'background-color 0.2s',
+          //     position: 'relative'
+          //   }}
+          //   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4b5563'}
+          //   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#374151'}
+          // ></div>
         )}
 
         <div key={chat.id} className="chat-log" ref={chatLogRef}>

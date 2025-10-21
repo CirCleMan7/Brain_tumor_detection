@@ -40,8 +40,9 @@ function Show2DImage({ setShowImage, imageFiles }) {
       maxWidth: "1000px", // max width so it doesn't get too big on big screens
       background: "white",
       padding: "10px",
-      zIndex: 999,
+      zIndex: 30,
       textAlign: "center",
+      background: "transparent",
     },
     image: {
       maxWidth: "400px",
@@ -61,7 +62,7 @@ function Show2DImage({ setShowImage, imageFiles }) {
       position: "fixed",
       left: "57%",
       cursor: "pointer",
-      zIndex: 998,
+      zIndex: 30,
     },
     imageNavArrow: {
       cursor: "pointer",
