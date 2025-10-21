@@ -22,7 +22,7 @@ const NoCaseNotice = () => {
 
         {/* Heading */}
         <h2 className="text-2xl font-semibold text-base-content mb-3">
-          No chat selected
+          No chat found
         </h2>
 
         {/* Description */}
