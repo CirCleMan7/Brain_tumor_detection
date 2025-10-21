@@ -153,10 +153,10 @@ export default function App() {
       console.log('image :', viewerImages)
       const basePrompt = `Please describe what is ${info} and suggested for treatment based on providing guidance.`
 
-      // const flowiseData = await sendToFlowise(basePrompt);
-      console.log('flowise content')
-      // const aiReply = flowiseData.reply?.text || "❌ Failed to connect AI.";
-      const aiReply = '❌ Failed to connect AI.'
+      const flowiseData = await sendToFlowise(basePrompt);
+      // console.log('flowise content')
+      const aiReply = flowiseData.reply?.text || "❌ Failed to connect AI.";
+      // const aiReply = '❌ Failed to connect AI.'
 
       let conversation = [
         { sender: 'ai', text: '✅ Case processed successfully.' },

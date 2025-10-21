@@ -36,7 +36,7 @@ function Show2DImage({ setShowImage, imageFiles }) {
       transform: 'translateX(-50%)',
       width: '90%', // responsive width
       maxWidth: '1000px', // max width so it doesn't get too big on big screens
-      background: 'white',
+      // background: 'white',
       padding: '10px',
       zIndex: 30,
       textAlign: 'center',
@@ -86,7 +86,6 @@ function Show2DImage({ setShowImage, imageFiles }) {
     return (
       <div>
         <p>No images to display.</p>
-        <button onClick={() => setShowImage(false)}>Close Viewer</button>
       </div>
     )
   }
