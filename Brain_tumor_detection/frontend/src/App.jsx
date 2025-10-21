@@ -9,7 +9,7 @@ import Introduction from "./Components/Introduction";
 import { useNavigate } from "react-router-dom";
 import ModalDelete from "./Components/Navbar/ModalDelete";
 import ModalInfo from "./Components/Navbar/ModalInfo"
-import PageNotFound from "./Components/Chat/PageNotFound"
+// import PageNotFound from "./Components/Chat/PageNotFound"
 
 const formatMetrics = (metrics) => {
   if (!metrics) return "No metrics available.";
@@ -273,7 +273,7 @@ export default function App() {
           <Routes>
             <Route path="/chat/:id" element={<ChatPage chats={chats} setChats={setChats} />} />
             <Route path="/" element={<Introduction />} />
-            <Route path="*" element={<PageNotFound />} />   {/* 👈 catch-all route */}
+            <Route path="*" element={<Introduction />} />   {/* 👈 catch-all route */}
           </Routes>
         </div>
       </div>
