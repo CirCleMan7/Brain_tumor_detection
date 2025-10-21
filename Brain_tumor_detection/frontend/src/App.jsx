@@ -32,8 +32,8 @@ async function sendToFlowise(content) {
       question: content,
     }
 
-    // const flowiseRes = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/flowise", {
-    const flowiseRes = await fetch('http://localhost:9000/flowise', {
+    const flowiseRes = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/flowise", {
+    // const flowiseRes = await fetch('http://localhost:9000/flowise', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody),
@@ -296,7 +296,10 @@ export default function App() {
           onClose={() => setShowModal(false)}
           onSubmit={(topic, content) => {
             setShowModal(false)
-            createNewChat(topic, content)
+            if (chats.length <= 1)
+              createNewChat(topic, content)
+            else
+              alert("You can create up to 2 chats only.")
           }}
         />
       )}
