@@ -39,7 +39,6 @@
   box-shadow: none; /* No inner shadow here */
   display: flex;
   align-items: center;
-  padding: 0; /* Remove padding as it's on .chat-input-inner now */
 }
 
 /* The Chat Textarea */
@@ -86,7 +85,6 @@
 .chat-textarea::-webkit-scrollbar-thumb:hover {
   background: #999;
 }
-
 
 /* The Send Button (now an icon button) */
 .send-button {
