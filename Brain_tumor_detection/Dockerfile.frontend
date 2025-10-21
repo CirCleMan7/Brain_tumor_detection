@@ -22,4 +22,4 @@ RUN npm install -g serve
 # Serve the build folder
 WORKDIR /app/frontend
 EXPOSE 3000
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["serve", "-s", "dist", "-l", "--single", "3000"]
