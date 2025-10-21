@@ -33,9 +33,9 @@ async function sendToFlowise(content) {
     }
 
     // const flowiseRes = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/flowise", {
-    const flowiseRes = await fetch("http://localhost:9000/flowise", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const flowiseRes = await fetch('http://localhost:9000/flowise', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody),
     })
 
@@ -69,18 +69,7 @@ export default function App() {
     return new Promise((resolve) => setTimeout(resolve, ms))
   }
 
-  async function removeChat(chat) {
-    // 1. set id for delete
-    let id = chat.id
-
-    // 2. Delete all related image files
-    // if (chat.content?.viewerImages?.length) {
-    //   for (const img of chat.content.viewerImages) {
-    //     await deleteFile(img); // assuming img.image is the URL
-    //   }
-    // }
-
-    // 3. Remove the chat from state
+  async function removeChat({ id }) {
     setChats((prev) => prev.filter((c) => c.id !== id))
   }
 
@@ -106,9 +95,6 @@ export default function App() {
     }
 
     setChats((prev) => [...prev, newChat])
-    console.log(chats)
-
-    await new Promise((r) => setTimeout(r, 5000))
 
     // Step 2: Navigate to new chat page
     navigate(`/chat/${chatId}`)
@@ -139,12 +125,15 @@ export default function App() {
 
       // const res = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/submit_case", {
       // const res = await fetch("http://localhost:9000/submit_case", {
-      const res = await fetch("https://nadene-spaviet-camie.ngrok-free.dev/submit_case", {
-        method: "POST",
-        body: formData,
-      });
-      
-      console.log("create res")
+      const res = await fetch(
+        'https://nadene-spaviet-camie.ngrok-free.dev/submit_case',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      )
+
+      console.log('create res')
       newChat.conversation[0].process = false
       if (!res.ok) {
         const errText = await res.text() // helpful for debugging
@@ -221,9 +210,9 @@ export default function App() {
                 }`
               : `**Predicted labels:** ${data.predicted_labels} | **Tumor volume:** ${data.tumor_volume} | **Tumor slices:** ## ${data.tumor_slices}`
           }`,
-      });
-      
-      conversation.push({ sender: "ai", text: aiReply });
+      })
+
+      conversation.push({ sender: 'ai', text: aiReply })
 
       console.log(viewerImages)
 
@@ -276,7 +265,7 @@ export default function App() {
 
   return (
     <>
-      <div style={{ display: "flex" }}>
+      <div style={{ display: 'flex' }}>
         <Sidebar
           chats={chats}
           setChats={setChats}
@@ -287,11 +276,15 @@ export default function App() {
           setInteractChat={setInteractChat}
         />
 
-        <div style={{ marginLeft: "200px", flex: 1, }}>
+        <div style={{ marginLeft: '220px', flex: 1 }}>
           <Routes>
-            <Route path="/chat/:id" element={<ChatPage chats={chats} setChats={setChats} />} />
+            <Route
+              path="/chat/:id"
+              element={<ChatPage chats={chats} setChats={setChats} />}
+            />
             <Route path="/" element={<Introduction />} />
-            <Route path="*" element={<Introduction />} />   {/* 👈 catch-all route */}
+            <Route path="*" element={<Introduction />} />
+            {/* 👈 catch-all route */}
           </Routes>
         </div>
       </div>
