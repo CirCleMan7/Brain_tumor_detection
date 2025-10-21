@@ -15,8 +15,9 @@
   width: 100%;
   height: 100vh;
   /* background: rgb(5, 0, 27); */
-  /* background: #110093; */
-  background: gainsboro;
+  /* background: #C3CFE2; */
+  /* background: gainsboro; */
+  background: linear-gradient(135deg, #e0e7ff 0%, #cfd9df 100%);
   /* border: #3b82f6; */
 
   /* background: #fafafa; */

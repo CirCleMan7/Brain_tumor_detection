@@ -7,6 +7,7 @@ import ChatInput from './ChatInput'
 import PapayaViewerNew from './../PapayaViewerNew'
 import Show2DImage from './Show2DImage'
 import SlideWrapper from '../Navbar/SlideWrapper'
+import NoCaseNotice from './NoCaseNotice'
 
 export default function ChatPage({ chats, setChats }) {
   const { id } = useParams()
@@ -257,12 +258,7 @@ export default function ChatPage({ chats, setChats }) {
   }
 
   if (!chat) {
-    return (
-      <div style={{ padding: '20px', color: 'black' }}>
-        <h2>No chat found</h2>
-        <p>Please select a chat from the sidebar or create a new case.</p>
-      </div>
-    )
+    return <NoCaseNotice />
   }
 
   return (
@@ -270,10 +266,7 @@ export default function ChatPage({ chats, setChats }) {
       {/* Left: Viewer */}
       <SlideWrapper>
         {
-          <div
-            className="viewer-container"
-          
-          >
+          <div className="viewer-container">
             {chat?.content?.selectedDimension === '2D' ? (
               <Show2DImage
                 key={chat.id}
@@ -290,14 +283,10 @@ export default function ChatPage({ chats, setChats }) {
             ) : (
               <>
                 <div>
-                  <h1>Brain Tumor Segmentation</h1>
                   <button className="btn" onClick={loadExampleImages}>
                     Predict & Show
                   </button>
                   <PapayaViewerNew viewerParams={viewerParams} />
-                </div>
-                <div onClick={handleCloseViewer}>
-                  <div className="arrow left" />
                 </div>
               </>
             )}
@@ -305,37 +294,15 @@ export default function ChatPage({ chats, setChats }) {
         }
       </SlideWrapper>
       {/* Right: Chat Section */}
-      <div className="chat-container" style={{ flexGrow: 1, marginLeft: 5 }}>
+      <div className="chat-container" style={{ flexGrow: 1 }}>
         {!showImage &&
           (chat?.content?.viewerImages?.length > 0 ||
             chat.content.selectedDimension === '3D') && (
-            // <div
-            //   style={styles.toggleButton}
-            //   className="arrow right"
-            //   onClick={handleOpenViewer}
-            // />
-
             <div
               style={styles.toggleButton}
               className="arrow right"
               onClick={handleOpenViewer}
             />
-            // <div
-            //   onClick={handleCloseViewer}
-            //   style={{
-            //     width: '40px',
-            //     height: '100%',
-            //     backgroundColor: '#374151',
-            //     display: 'flex',
-            //     alignItems: 'center',
-            //     justifyContent: 'center',
-            //     cursor: 'pointer',
-            //     transition: 'background-color 0.2s',
-            //     position: 'relative'
-            //   }}
-            //   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4b5563'}
-            //   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#374151'}
-            // ></div>
           )}
 
         <div key={chat.id} className="chat-log" ref={chatLogRef}>

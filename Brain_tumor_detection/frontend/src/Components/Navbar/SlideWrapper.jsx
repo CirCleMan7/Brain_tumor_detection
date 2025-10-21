@@ -1,49 +1,44 @@
 import { MdOutlineKeyboardArrowLeft } from 'react-icons/md'
 import { useState } from 'react'
 
-const SlideWrapper = ({ children }) => {
-  const [open, setOpen] = useState(true)
+const PANEL_W = 500
 
-  const handleToggle = () => {
-    setOpen(!open)
-  }
+const SlideWrapper = ({ children }) => {
+  const [open, setOpen] = useState(false)
 
   return (
-    <div className={['flex items-center h-screen relative'].join(' ')}>
+    <div
+      className="flex h-screen"
+      style={{ '--panel-w': open ? `${PANEL_W}px` : '0px' }}
+    >
       <div
         className={[
-          'transition-[max-width] w-[400px] duration-500 ease-in-out overflow-hidden min-w-0',
-          open ? 'max-w-[100%]' : 'max-w-0 opacity-80 pointer-events-none',
+          'shrink-0 overflow-hidden',
+          'w-[var(--panel-w)] transition-[width] duration-500 ease-in-out',
+          '[will-change:width]',
         ].join(' ')}
+        aria-hidden={!open}
       >
         {children}
       </div>
-      {/* <MdOutlineKeyboardArrowLeft
-        size={60}
-        className={[
-          'text-gray-500 hover:text-black hover:scale-120 transition-transform duration-200 cursor-pointer',
-          open ? '-translate-x-[60px]' : 'rotate-180 ',
-        ].join(' ')}
-        onClick={handleToggle}
-      /> */}
-      <div
-        className={[
-          'bg-black w-[30px] h-full z-0 flex items-center cursor-pointer',
-          'transition-transform duration-500 ease-in-out ',
-          open ? '' : 'translate-x-[0px]',
-        ].join(' ')}
-        onClick={handleToggle}
+
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="shrink-0 w-[30px] h-full bg-black flex items-center justify-center cursor-pointer focus:outline-none"
+        aria-pressed={open}
+        aria-label={open ? 'Close panel' : 'Open panel'}
       >
         <MdOutlineKeyboardArrowLeft
           size={60}
           className={[
-            'z-10 text-gray-500 hover:text-black hover:scale-120 transition-transform duration-200 ',
-            open ? '' : 'rotate-180 ',
-            'hover:text-gray-300',
+            'text-gray-500 transition-transform duration-300 hover:text-gray-300 hover:scale-[1.2]',
+            open ? '' : 'rotate-180',
           ].join(' ')}
         />
-      </div>
+      </button>
     </div>
   )
 }
+
 export default SlideWrapper
