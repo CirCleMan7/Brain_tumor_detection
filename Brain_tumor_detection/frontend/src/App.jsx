@@ -134,8 +134,8 @@ export default function App() {
         formData.append("t1ceFiles", content.t1ceFiles[0]);
       }
 
-      // const res = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/submit_case", {
-      const res = await fetch("http://localhost:9000/submit_case", {
+      const res = await fetch("https://4xrw8qp1-8000.asse.devtunnels.ms/submit_case", {
+      // const res = await fetch("http://localhost:9000/submit_case", {
         method: "POST",
         body: formData,
       });
