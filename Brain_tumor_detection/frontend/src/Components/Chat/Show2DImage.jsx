@@ -83,15 +83,31 @@ function Show2DImage({ setShowImage, imageFiles }) {
     },
   };
 
-  // If no images, render a message instead of the viewer
-  if (totalImages === 0) {
-    return (
-      <div style={styles.fixedContainer}>
-        <p>No images to display.</p>
-        <button onClick={() => setShowImage(false)}>Close Viewer</button>
-      </div>
-    );
-  }
+  const [images, setImages] = useState([]);
+
+  // useEffect(() => {
+  //   Promise.all(
+  //     currentImage.url.map((url) =>
+  //       fetch(url, {
+  //         headers: { "ngrok-skip-browser-warning": "true" },
+  //       })
+  //         .then((res) => res.blob())
+  //         .then((blob) => URL.createObjectURL(blob))
+  //     )
+  //   ).then(setImages);
+  // }, []);
+  // // If no images, render a message instead of the viewer
+  // if (totalImages === 0) {
+  //   return (
+  //     <div style={styles.fixedContainer}>
+  //       <p>No images to display.</p>
+  //       <button onClick={() => setShowImage(false)}>Close Viewer</button>
+  //     </div>
+  //   );
+  // }
+
+  // console.log(currentImage.url)
+  console.log("image File", imageFiles)
 
   return (
     <div style={styles.fixedContainer}>

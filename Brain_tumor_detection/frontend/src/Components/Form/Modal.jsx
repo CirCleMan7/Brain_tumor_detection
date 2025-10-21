@@ -195,6 +195,8 @@ export default function Modal({ onClose, onSubmit, chats }) {
                 ref={flairFileInputRef} 
                 onChange={handleFlairFileChange} 
                 accept=".nii,.nii.gz"
+                // accept="application/octet-stream"
+                // accept="*/*"
                 style={{ display: "none" }} 
               />
               <div className="file-list">
@@ -221,6 +223,8 @@ export default function Modal({ onClose, onSubmit, chats }) {
                 ref={t1ceFileInputRef} 
                 onChange={handleT1ceFileChange} 
                 accept=".nii,.nii.gz"
+                // accept="application/octet-stream"
+                // accept="*/*"
                 style={{ display: "none" }} 
               />
               <div className="file-list">

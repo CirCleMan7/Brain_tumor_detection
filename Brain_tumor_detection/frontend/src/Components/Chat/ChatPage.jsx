@@ -139,24 +139,62 @@ export default function ChatPage({ chats, setChats }) {
 
   const [viewerParams, setViewerParams] = useState(null)
 
-  const loadExampleImages = () => {
-    setViewerParams({
-      images: [
-        chat.content.viewerImages[0], // base image
-        chat.content.viewerImages[2], // overlay image
-      ],
-      kioskMode: false,
-      showControlBar: true,
-      smoothDisplay: false,
-      // กำหนดพารามิเตอร์ overlay ตามชื่อไฟล์
-      [chat.content.viewerImages[2]]: {
-        lut: 'Red Overlay',
-        alpha: 0.5,
-        min: 0,
-        max: 3,
-      },
-    })
-  }
+  // const loadExampleImages = () => {
+  //   setViewerParams({
+  //     images: [
+  //       chat.content.viewerImages[0], // base image
+  //       chat.content.viewerImages[2], // overlay image
+  //     ],
+  //     kioskMode: false,
+  //     showControlBar: true,
+  //     smoothDisplay: false,
+  //     // กำหนดพารามิเตอร์ overlay ตามชื่อไฟล์
+  //     [chat.content.viewerImages[2]]: {
+  //       lut: 'Red Overlay',
+  //       alpha: 0.5,
+  //       min: 0,
+  //       max: 3,
+  //     },
+  //   })
+  
+  //   console.log("chat viewer 0 ", chat?.content?.viewerImages[0])
+  //   console.log("chat viewer 2 ", chat?.content?.viewerImages[2])
+  // }
+
+  async function loadExampleImages() {
+  const urls = [
+    chat.content.viewerImages[0],
+    chat.content.viewerImages[2],
+  ];
+
+  console.log("urls :", urls)
+
+  const blobs = await Promise.all(
+    urls.map((url) =>
+      fetch(url, {
+        headers: { "ngrok-skip-browser-warning": "true" },
+      })
+        .then((res) => res.blob())
+        .then((blob) => URL.createObjectURL(blob))
+    )
+  );
+
+  console.log(blobs)
+
+  setViewerParams({
+    images: blobs,
+    kioskMode: false,
+    showControlBar: true,
+    smoothDisplay: false,
+    [blobs[1]]: {
+      lut: 'Red Overlay',
+      alpha: 0.5,
+      min: 0,
+      max: 3,
+    },
+  });
+}
+
 
   const imageFiles3D =
     chat?.content?.viewerImages?.map((path, i) => ({
