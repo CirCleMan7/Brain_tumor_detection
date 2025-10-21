@@ -234,7 +234,7 @@ export default function ChatPage({ chats, setChats }) {
         {
           <div
             className="viewer-container"
-            style={{ width: 800 /* fix width for viewer */ }}
+          
           >
             {chat?.content?.selectedDimension === '2D' ? (
               <Show2DImage

@@ -12,8 +12,8 @@ const SlideWrapper = ({ children }) => {
     <div className={['flex items-center h-screen relative'].join(' ')}>
       <div
         className={[
-          'transition-[max-width] duration-500 ease-in-out overflow-hidden min-w-0',
-          open ? 'max-w-[800px]' : 'max-w-0 opacity-80 pointer-events-none',
+          'transition-[max-width] w-[400px] duration-500 ease-in-out overflow-hidden min-w-0',
+          open ? 'max-w-[100%]' : 'max-w-0 opacity-80 pointer-events-none',
         ].join(' ')}
       >
         {children}

@@ -287,7 +287,7 @@ export default function App() {
           setInteractChat={setInteractChat}
         />
 
-        <div style={{ marginLeft: "200px", padding: "20px", flex: 1, }}>
+        <div style={{ marginLeft: "200px", flex: 1, }}>
           <Routes>
             <Route path="/chat/:id" element={<ChatPage chats={chats} setChats={setChats} />} />
             <Route path="/" element={<Introduction />} />
@@ -328,6 +328,6 @@ export default function App() {
           }}
         />
       )}
-    </div>
+    </>
   )
 }
