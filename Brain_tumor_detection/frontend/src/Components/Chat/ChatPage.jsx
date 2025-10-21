@@ -168,8 +168,6 @@ export default function ChatPage({ chats, setChats }) {
     chat.content.viewerImages[2],
   ];
 
-  console.log("urls :", urls)
-
   const blobs = await Promise.all(
     urls.map((url) =>
       fetch(url, {
@@ -179,8 +177,6 @@ export default function ChatPage({ chats, setChats }) {
         .then((blob) => URL.createObjectURL(blob))
     )
   );
-
-  console.log(blobs)
 
   setViewerParams({
     images: blobs,

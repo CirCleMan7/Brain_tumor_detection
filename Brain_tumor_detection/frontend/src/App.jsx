@@ -49,7 +49,6 @@ async function sendToFlowise(content) {
     }
 
     const flowiseOutput = await flowiseRes.json()
-    console.log('Flowise Response:', flowiseOutput)
     return flowiseOutput
   } catch (error) {
     console.error('Error sending data to Flowise:', error)
@@ -133,15 +132,12 @@ export default function App() {
         }
       )
 
-      console.log('create res')
       newChat.conversation[0].process = false
       if (!res.ok) {
         const errText = await res.text() // helpful for debugging
         throw new Error(`Backend error: ${res.status} - ${errText}`)
       }
 
-      console.log(chats)
-      console.log('test')
       const data = await res.json()
       // const data = {"text" : "eiei"}
 
@@ -150,7 +146,7 @@ export default function App() {
         : `predicted_labels : ${data.predicted_labels}, tumor_volume : ${data.tumor_volume}, tumor_slices : ${data.tumor_slices} and testIndication ${content.testIndication}`
 
       const viewerImages = data.image_urls
-      console.log('image :', viewerImages)
+
       const basePrompt = `Please describe what is ${info} and suggested for treatment based on providing guidance.`
 
       const flowiseData = await sendToFlowise(basePrompt);
@@ -175,8 +171,6 @@ export default function App() {
           text: '🧠 Detected 3D scan (NIfTI). Opening viewer...',
         })
 
-        console.log('data : ')
-        console.log(data)
         // ✅ Include predicted tumor labels (optional)
         if (data.predicted_labels?.length) {
           conversation.push({
@@ -213,8 +207,6 @@ export default function App() {
       })
 
       conversation.push({ sender: 'ai', text: aiReply })
-
-      console.log(viewerImages)
 
       // ✅ Update chat state with additional 3D image url (or 2D image previews)
       setChats((prevChats) =>

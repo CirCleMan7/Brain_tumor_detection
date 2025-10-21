@@ -32,7 +32,7 @@ export async function loadPapayaOnce() {
   }
 
   papayaLoaded = true;
-  console.log("✅ Papaya loaded");
+  // console.log("✅ Papaya loaded");
 
   return true;
 }

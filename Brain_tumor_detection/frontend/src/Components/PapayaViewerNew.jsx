@@ -19,14 +19,14 @@ export default function PapayaViewer({ viewerParams }) {
 
       // Add Viewer
       if (window.papaya?.Container) {
-        console.log("✨ เรียก addViewer");
+        // console.log("✨ เรียก addViewer");
         window.papaya.Container.addViewer("papaya-container", viewerParams);
 
         // รอให้ viewer โหลดเสร็จแล้ว resize ให้พอดีกับ container
         setTimeout(() => {
           if (window.papaya.Container.resizeViewerComponents) {
             window.papaya.Container.resizeViewerComponents();
-            console.log("✅ Papaya viewer resized to container");
+            // console.log("✅ Papaya viewer resized to container");
           }
         }, 100); // delay เล็กน้อยเพื่อให้ viewer สร้าง DOM เสร็จ
       } else {
